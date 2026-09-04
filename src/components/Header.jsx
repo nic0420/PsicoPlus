@@ -5,8 +5,6 @@ import {
   Video, 
   Eye, 
   EyeOff, 
-  Sun, 
-  Moon, 
   ShieldAlert, 
   CalendarDays,
   Globe,
@@ -176,15 +174,6 @@ export const Header = ({
           <div className="hidden xl:flex items-center text-xs font-mono font-medium text-emerald-700/70 dark:text-emerald-400/70 bg-emerald-50/80 dark:bg-emerald-950/40 px-2.5 py-1.5 rounded-lg border border-emerald-200/60 dark:border-emerald-900/60">
             {time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </div>
-
-          {/* Dark Mode toggle */}
-          <button
-            onClick={onToggleDarkMode}
-            className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all border border-slate-200 dark:border-slate-700"
-            title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-          >
-            {isDarkMode ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-slate-600" />}
-          </button>
 
           {onSignOut && (
             <button
