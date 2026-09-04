@@ -47,11 +47,13 @@ button, input, select, textarea {
   height: 44px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: 14px;
-  color: #fff;
-  background: var(--primary-gradient);
+  background: #dff7e8;
   box-shadow: var(--shadow-glow-primary);
 }
+.brand-mark img { width: 36px; height: 36px; object-fit: contain; }
+.mobile-brand-mark img { width: 30px; height: 30px; object-fit: contain; }
 
 .login-shell {
   min-height: 100vh;
@@ -163,7 +165,10 @@ button, input, select, textarea {
 .workspace-sidebar { width: 274px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 14px 14px; color: #d8eee0; background: #10251b; border-right: 1px solid rgba(140, 205, 162, .14); }
 .sidebar-top { min-height: 0; }
 .sidebar-brand-row { display:flex; align-items:center; gap:10px; padding: 0 8px 20px; }
-.sidebar-brand-mark { display:grid; place-items:center; width:38px; height:38px; flex-shrink:0; border-radius:12px; color:#123821; background:#a8e2b7; box-shadow:0 8px 20px rgba(168,226,183,.12); }
+.sidebar-brand-mark { display:grid; place-items:center; width:38px; height:38px; flex-shrink:0; overflow:hidden; border-radius:12px; background:#dff7e8; box-shadow:0 8px 20px rgba(168,226,183,.12); }
+.sidebar-brand-mark img { width:30px; height:30px; object-fit:contain; }
+.mobile-brand-logo { display:grid; place-items:center; width:27px; height:27px; overflow:hidden; border-radius:8px; background:#e3f8eb; }
+.mobile-brand-logo img { width:22px; height:22px; object-fit:contain; }
 .sidebar-brand-name { color:#f4fff7; font-size:1rem; font-weight:800; letter-spacing:-.03em; }
 .sidebar-brand-name span { margin-left:4px; padding:3px 5px; color:#b7e6c5; border:1px solid rgba(183,230,197,.3); border-radius:5px; font-size:.52rem; letter-spacing:.08em; vertical-align:2px; }
 .sidebar-brand-copy p { margin:3px 0 0; color:#86ad94; font-size:.62rem; }

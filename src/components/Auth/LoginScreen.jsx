@@ -49,7 +49,7 @@ export function LoginScreen({ onAuthenticated }) {
     <main className="login-shell">
       <section className="login-visual" aria-label="Información de PsicoPlus">
         <div className="login-brand">
-          <div className="brand-mark"><HeartPulse size={22} /></div>
+          <div className="brand-mark"><img src="/psicoplus-logo.png" alt="PsicoPlus" /></div>
           <div><strong>PsicoPlus</strong><span>Gestión clínica simple</span></div>
         </div>
         <div className="login-visual-copy">
@@ -64,7 +64,7 @@ export function LoginScreen({ onAuthenticated }) {
       <section className="login-panel">
         <div className="login-card">
           <div className="login-card-heading">
-            <span className="mobile-brand-mark"><HeartPulse size={19} /></span>
+            <span className="mobile-brand-mark"><img src="/psicoplus-logo.png" alt="PsicoPlus" /></span>
             <span className="eyebrow">Bienvenido/a de nuevo</span>
             <h2>Ingresá a tu cuenta</h2>
             <p>Accedé a tu espacio profesional para continuar.</p>
