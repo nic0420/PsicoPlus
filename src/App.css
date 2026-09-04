@@ -112,6 +112,11 @@ button, input, select, textarea {
 .login-submit { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; margin-top: 18px; border: 0; border-radius: 12px; background: var(--primary-gradient); color: #fff; font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-glow-primary); }
 .login-submit:hover { filter: brightness(1.05); transform: translateY(-1px); }
 .login-submit:disabled { opacity: .7; cursor: wait; transform: none; }
+.login-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--text-light); font-size: .65rem; }
+.login-divider::before, .login-divider::after { content: ''; height: 1px; flex: 1; background: var(--border-color); }
+.login-demo { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 46px; border: 1px solid rgba(45,154,95,.34); border-radius: 12px; background: var(--primary-soft); color: var(--primary); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
+.login-demo:hover { border-color: var(--primary); background: rgba(45,154,95,.16); transform: translateY(-1px); }
+.login-demo-note { margin: 9px 0 0; color: var(--text-light); font-size: .66rem; line-height: 1.45; text-align: center; }
 .login-error { padding: 10px 12px; margin-top: 8px; border: 1px solid #f4b5be; border-radius: 10px; background: #fff1f2; color: #9f1239; font-size: .74rem; line-height: 1.4; }
 .login-security, .login-config-note { color: var(--text-light); font-size: .7rem; line-height: 1.55; text-align: center; margin-top: 19px; }
 .login-config-note { color: #92400e; }

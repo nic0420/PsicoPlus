@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Eye, EyeOff, HeartPulse, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, HeartPulse, LockKeyhole, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export function LoginScreen({ onAuthenticated }) {
@@ -8,6 +8,15 @@ export function LoginScreen({ onAuthenticated }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  const handleDemoAccess = () => {
+    setError('');
+    onAuthenticated({
+      access_token: 'visual-demo-session',
+      user: { id: 'visual-demo-user', email: 'demo@psicoplus.local', user_metadata: { full_name: 'Modo demostración' } },
+      isDemo: true,
+    });
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -81,6 +90,12 @@ export function LoginScreen({ onAuthenticated }) {
               {!isSubmitting && <ArrowRight size={17} />}
             </button>
           </form>
+          <div className="login-divider"><span>o explorá la interfaz</span></div>
+          <button className="login-demo" type="button" onClick={handleDemoAccess}>
+            <Sparkles size={16} aria-hidden="true" />
+            Entrar sin registrarme
+          </button>
+          <p className="login-demo-note">Modo demostración: podés recorrer el dashboard sin crear una cuenta.</p>
           <p className="login-security">Tus datos se mantienen protegidos mediante autenticación segura.</p>
           {!isSupabaseConfigured && <p className="login-config-note">Configurá las variables públicas de Supabase para habilitar el acceso.</p>}
         </div>
