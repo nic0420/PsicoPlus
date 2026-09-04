@@ -28,7 +28,8 @@ export function AppContent() {
   const [activeTab, setActiveTab] = useState(isDirectPortal ? 'portal-pacientes' : 'dashboard');
   const [selectedSedeId, setSelectedSedeId] = useState('all');
   const [privacyMode, setPrivacyMode] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(initial.theme === 'dark');
+  // PsicoPlus uses a consistent dark workspace for visual comfort during long clinical sessions.
+  const [isDarkMode] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
