@@ -29,7 +29,8 @@ export const Header = ({
   onNavigatePortal,
   onNavigateAgenda,
   onOpenMobileMenu,
-  onOpenSearch
+  onOpenSearch,
+  onSignOut
 }) => {
   const [time, setTime] = useState(new Date());
 
@@ -184,6 +185,16 @@ export const Header = ({
           >
             {isDarkMode ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-slate-600" />}
           </button>
+
+          {onSignOut && (
+            <button
+              onClick={onSignOut}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-200 hover:text-rose-600 transition-all"
+              title="Cerrar sesión"
+            >
+              Salir
+            </button>
+          )}
 
         </div>
       </div>
