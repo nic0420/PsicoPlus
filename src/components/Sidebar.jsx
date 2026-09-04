@@ -69,32 +69,19 @@ export const Sidebar = ({
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-3 space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left relative ${
-                  isActive
-                    ? 'bg-emerald-700 text-white shadow-sm shadow-emerald-700/30'
-                    : 'text-emerald-400/70 hover:text-emerald-200 hover:bg-emerald-900/40'
-                }`}
-              >
-                <Icon size={17} className={isActive ? 'text-white' : 'text-emerald-400/60'} />
-                <span className="tracking-normal text-[13px]">{item.label}</span>
-
-                {/* Badge for portal requests */}
-                {item.badge > 0 && (
-                  <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        <nav className="p-3 flex flex-col gap-4">
+          {[{ label: 'Espacio de trabajo', items: menuItems.slice(0, 3) }, { label: 'Administración', items: menuItems.slice(3, 7) }, { label: 'Sistema', items: menuItems.slice(7) }].map((group) => (
+            <div key={group.label}>
+              <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.14em] text-emerald-500/55 font-bold">{group.label}</p>
+              <div className="space-y-1">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return <button key={item.id} onClick={() => handleItemClick(item.id)} className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left relative ${isActive ? 'bg-emerald-700 text-white shadow-sm shadow-emerald-700/30' : 'text-emerald-400/70 hover:text-emerald-200 hover:bg-emerald-900/40'}`}><Icon size={17} className={isActive ? 'text-white' : 'text-emerald-400/60'} /><span className="tracking-normal text-[13px]">{item.label}</span>{item.badge > 0 && <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">{item.badge}</span>}</button>;
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
       </div>
 
