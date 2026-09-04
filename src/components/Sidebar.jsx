@@ -63,7 +63,7 @@ export const Sidebar = ({
     <div className="workspace-sidebar">
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
-          <div className="sidebar-brand-mark"><HeartPulse size={19} /></div>
+          <div className="sidebar-brand-mark"><img src="/psicoplus-logo.png" alt="PsicoPlus" /></div>
           <div className="sidebar-brand-copy">
             <div className="sidebar-brand-name">PsicoPlus <span>PRO</span></div>
             <p>Tu práctica, más simple</p>

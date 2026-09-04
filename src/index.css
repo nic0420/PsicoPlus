@@ -9,6 +9,7 @@
   --primary: #2d9a5f;
   --primary-hover: #258a52;
   --primary-light: #e8f7ef;
+  --primary-soft: #edf9f1;
   --primary-dark: #1e7a45;
   --primary-gradient: linear-gradient(135deg, #2d9a5f 0%, #3ab876 60%, #6dd5a0 100%);
   --secondary-gradient: linear-gradient(135deg, #162e1e 0%, #1e3d28 100%);
@@ -21,8 +22,8 @@
   --bg-card: #ffffff;
   --bg-sidebar: #0d1f15;
   --text-main: #0f2419;
-  --text-muted: #476353;
-  --text-light: #8faa9a;
+  --text-muted: #315443;
+  --text-light: #5f7c6b;
   --border-color: #d1e8da;
   --border-subtle: #e8f5ee;
 

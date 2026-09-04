@@ -60,8 +60,8 @@ export const Header = ({
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs">
-              <HeartPulse size={14} />
+            <div className="mobile-brand-logo">
+              <img src="/psicoplus-logo.png" alt="PsicoPlus" />
             </div>
             <span className="font-bold text-sm text-slate-900 dark:text-white font-display">PsicoPlus</span>
           </div>
