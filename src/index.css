@@ -1,0 +1,405 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', var(--font-sans);
+
+  /* Paleta Botánica Clínica - Verde Suave & Pasteles */
+  --primary: #2d9a5f;
+  --primary-hover: #258a52;
+  --primary-light: #e8f7ef;
+  --primary-dark: #1e7a45;
+  --primary-gradient: linear-gradient(135deg, #2d9a5f 0%, #3ab876 60%, #6dd5a0 100%);
+  --secondary-gradient: linear-gradient(135deg, #162e1e 0%, #1e3d28 100%);
+  --accent-emerald-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --accent-rose-gradient: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  --accent-amber-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+
+  /* Neutros & Fondos - Cálidos & Suaves */
+  --bg-app: #f0f9f4;
+  --bg-card: #ffffff;
+  --bg-sidebar: #0d1f15;
+  --text-main: #0f2419;
+  --text-muted: #476353;
+  --text-light: #8faa9a;
+  --border-color: #d1e8da;
+  --border-subtle: #e8f5ee;
+
+  /* Colores Pasteles y Suaves de Estado */
+  --pastel-purple: #f0fdf4;
+  --pastel-purple-text: #166534;
+  --pastel-pink: #fff1f2;
+  --pastel-pink-text: #9f1239;
+  --pastel-mint: #e8f7ef;
+  --pastel-mint-text: #166534;
+  --pastel-sky: #f0f9ff;
+  --pastel-sky-text: #0369a1;
+  --pastel-amber: #fffbeb;
+  --pastel-amber-text: #92400e;
+
+  /* Sombras y Curvaturas */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 4px 12px -2px rgba(15, 36, 25, 0.04);
+  --shadow-hover: 0 10px 25px -4px rgba(15, 36, 25, 0.08), 0 4px 10px -2px rgba(15, 36, 25, 0.04);
+  --shadow-glow-primary: 0 4px 20px rgba(45, 154, 95, 0.25);
+  --shadow-glow-emerald: 0 4px 20px rgba(16, 185, 129, 0.22);
+}
+
+.dark {
+  --bg-app: #060e09;
+  --bg-card: #0f1a14;
+  --bg-sidebar: #040a07;
+  --text-main: #e8f7ef;
+  --text-muted: #8faa9a;
+  --text-light: #5a7a6a;
+  --border-color: #1e3d28;
+  --border-subtle: #132a1c;
+
+  --pastel-purple: #0a2e1a;
+  --pastel-purple-text: #86efac;
+  --pastel-pink: #371424;
+  --pastel-pink-text: #fecdd3;
+  --pastel-mint: #0a2e1a;
+  --pastel-mint-text: #86efac;
+  --pastel-sky: #082f49;
+  --pastel-sky-text: #bae6fd;
+  --pastel-amber: #451a03;
+  --pastel-amber-text: #fef08a;
+
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.65), 0 4px 12px -2px rgba(45, 154, 95, 0.15);
+  --shadow-glow-primary: 0 0 25px rgba(45, 154, 95, 0.35);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(45, 154, 95, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 40%),
+    radial-gradient(at 50% 100%, rgba(45, 154, 95, 0.03) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(at 0% 0%, rgba(45, 154, 95, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 40%),
+    radial-gradient(at 50% 100%, rgba(45, 154, 95, 0.08) 0px, transparent 60%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Safe Area Insets */
+.pb-safe {
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+button, a, select, input, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #b0d4c0;
+  border-radius: 999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2a4a38;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7aaa92;
+}
+
+/* Modo Privacidad */
+.privacy-blur {
+  filter: blur(9px) !important;
+  user-select: none !important;
+  pointer-events: none;
+  transition: filter 0.25s ease;
+}
+
+/* Glassmorphism Suave y Elegante - Verde Botánico */
+.glass-panel {
+  background: rgba(240, 249, 244, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(209, 232, 218, 0.8);
+}
+.dark .glass-panel {
+  background: rgba(15, 26, 20, 0.88);
+  border: 1px solid rgba(30, 61, 40, 0.8);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(209, 232, 218, 0.6);
+}
+.dark .glass-card {
+  background: rgba(15, 26, 20, 0.72);
+  border: 1px solid rgba(30, 61, 40, 0.6);
+}
+
+/* Cards Clínicas de Alto Nivel */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: #a8d5bb;
+}
+.dark .card:hover {
+  border-color: #2a4a38;
+}
+
+/* Tarjetas Glow Suaves - Verde Botánico */
+.card-glow-purple {
+  border: 1px solid rgba(45, 154, 95, 0.22);
+}
+.card-glow-purple:hover {
+  box-shadow: 0 10px 24px -4px rgba(45, 154, 95, 0.12);
+  border-color: rgba(45, 154, 95, 0.45);
+}
+
+.card-glow-emerald {
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+.card-glow-emerald:hover {
+  box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.card-glow-amber {
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+.card-glow-amber:hover {
+  box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+/* Botones Profesionales & Ergonómicos */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 18px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-sans);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(30, 122, 69, 0.28);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 14px rgba(30, 122, 69, 0.4);
+  filter: brightness(1.04);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #3a5a4a;
+  border-color: #d1e8da;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.dark .btn-secondary {
+  background: #1e3d28;
+  color: #d1e8da;
+  border-color: #2a4a38;
+}
+.btn-secondary:hover {
+  background: #f0f9f4;
+  color: #0f2419;
+  border-color: #a8d5bb;
+}
+.dark .btn-secondary:hover {
+  background: #234a32;
+  color: #e8f7ef;
+}
+
+.btn-whatsapp {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+}
+.btn-whatsapp:hover {
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  filter: brightness(1.05);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.25);
+}
+.btn-danger:hover {
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.38);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-main);
+}
+.dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* Badges con Colores Pasteles Suaves */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.badge-sede-centro {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.dark .badge-sede-centro {
+  background: #064e3b;
+  color: #a7f3d0;
+  border-color: #047857;
+}
+
+.badge-sede-sanmartin {
+  background: #fce7f3;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
+}
+.dark .badge-sede-sanmartin {
+  background: #4c0519;
+  color: #fbcfe8;
+  border-color: #be185d;
+}
+
+.badge-sede-online {
+  background: #cffafe;
+  color: #0e7490;
+  border: 1px solid #a5f3fc;
+}
+.dark .badge-sede-online {
+  background: #083344;
+  color: #67e8f9;
+  border-color: #06b6d4;
+}
+
+/* Inputs y Selects */
+.input-field {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  transition: all 0.18s ease;
+  outline: none;
+}
+.input-field:focus {
+  border-color: #2d9a5f;
+  box-shadow: 0 0 0 3px rgba(45, 154, 95, 0.15);
+}
+.dark .input-field:focus {
+  border-color: #6dd5a0;
+  box-shadow: 0 0 0 3px rgba(109, 213, 160, 0.2);
+}
+
+/* Modales */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 36, 25, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes subtlePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.96; }
+}
+.animate-subtle-pulse {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
