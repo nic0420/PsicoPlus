@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { HeartPulse } from 'lucide-react';
 import { getStoredData, saveToStorage } from './services/storage';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -13,6 +14,8 @@ import { ConfiguracionView } from './components/Configuracion/ConfiguracionView'
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { ToastProvider } from './components/Common/Toast';
 import { CommandPalette } from './components/Common/CommandPalette';
+import { LoginScreen } from './components/Auth/LoginScreen';
+import { supabase } from './lib/supabase';
 import './App.css';
 
 export function AppContent() {
@@ -271,6 +274,7 @@ export function AppContent() {
           onNavigateAgenda={() => setActiveTab('agenda')}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onSignOut={() => supabase?.auth.signOut()}
         />
 
         <main className="flex-1 p-3.5 sm:p-6 md:p-8 pb-28 md:pb-8 max-w-7xl w-full mx-auto">
@@ -441,7 +445,46 @@ export function AppContent() {
   );
 }
 
+function AuthLoadingScreen() {
+  return (
+    <div className="auth-loading" role="status" aria-live="polite">
+      <div className="brand-mark"><HeartPulse size={22} /></div>
+      <span>Preparando tu espacio seguro…</span>
+    </div>
+  );
+}
+
 export function App() {
+  const [session, setSession] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const isPublicPortal = new URLSearchParams(window.location.search).get('portal') === 'paciente' || new URLSearchParams(window.location.search).get('portal') === 'turnos' || new URLSearchParams(window.location.search).get('reserva') === 'true';
+
+  useEffect(() => {
+    if (!supabase) {
+      setIsAuthLoading(false);
+      return undefined;
+    }
+
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) {
+        setSession(data.session);
+        setIsAuthLoading(false);
+      }
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsAuthLoading(false);
+    });
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (isAuthLoading && !isPublicPortal) return <AuthLoadingScreen />;
+  if (!session && !isPublicPortal) return <LoginScreen onAuthenticated={setSession} />;
+
   return (
     <ToastProvider>
       <AppContent />
