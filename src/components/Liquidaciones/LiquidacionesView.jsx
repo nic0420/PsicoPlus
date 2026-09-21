@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { generatePlanillaLiquidacionPDF } from '../../services/pdfGenerator';
 
+import { ProBadge } from '../Common/ProBadge';
+
 export const LiquidacionesView = ({
   obrasSociales,
   pacientes,
@@ -24,6 +26,8 @@ export const LiquidacionesView = ({
   onSaveLiquidacion,
   onUpdateLiquidacionEstado,
   onDeleteLiquidacion,
+  subscription = { plan: 'free' },
+  onOpenUpgradeModal
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOSId, setSelectedOSId] = useState('ioscor');
@@ -94,13 +98,49 @@ export const LiquidacionesView = ({
           </p>
         </div>
 
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="btn btn-primary text-xs self-start md:self-auto"
-        >
-          <Plus size={15} />
-          <span>Generar Planilla</span>
-        </button>
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <button 
+            onClick={() => {
+              const isPro = subscription?.plan === 'pro';
+              if (!isPro) {
+                if (onOpenUpgradeModal) {
+                  onOpenUpgradeModal('La liquidación y exportación masiva por lotes de todas las obras sociales es una función exclusiva de PsicoPlus PRO.');
+                }
+                return;
+              }
+              // Generate bulk
+              obrasSociales.filter(os => os.id !== 'particular').forEach(os => {
+                const pacs = pacientes.filter(p => p.obraSocialId === os.id);
+                if (pacs.length > 0) {
+                  const cantSes = pacs.reduce((a, c) => a + (c.sesionesConsumidas || 1), 0);
+                  onSaveLiquidacion({
+                    id: `liq-${Date.now()}-${os.id}`,
+                    obraSocialId: os.id,
+                    periodo: periodo,
+                    fechaPresentacion: new Date().toISOString().split('T')[0],
+                    cantidadSesiones: cantSes,
+                    montoBruto: cantSes * os.arancelSesion,
+                    estado: 'Presentada',
+                    observaciones: `Lote automático generado para ${os.nombre}.`,
+                  });
+                }
+              });
+            }}
+            className="btn btn-secondary text-xs flex items-center gap-1.5"
+            title="Generar liquidación de todas las obras sociales en 1 clic"
+          >
+            <span>Liquidación Masiva</span>
+            {subscription?.plan !== 'pro' && <ProBadge size="xs" text="PRO" />}
+          </button>
+
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn btn-primary text-xs"
+          >
+            <Plus size={15} />
+            <span>Generar Planilla</span>
+          </button>
+        </div>
       </div>
 
       {/* 3 Cards de Estado Financiero de Obras Sociales */}

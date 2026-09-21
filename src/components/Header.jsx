@@ -10,8 +10,11 @@ import {
   Globe,
   Menu,
   HeartPulse,
-  Search
+  Search,
+  Sparkles
 } from 'lucide-react';
+import { ProBadge } from './Common/ProBadge';
+import { PLANS } from '../services/subscription';
 
 export const Header = ({ 
   sedes, 
@@ -28,9 +31,12 @@ export const Header = ({
   onNavigateAgenda,
   onOpenMobileMenu,
   onOpenSearch,
+  subscription = { plan: PLANS.FREE },
+  onOpenUpgradeModal,
   onSignOut
 }) => {
   const [time, setTime] = useState(new Date());
+  const isPro = subscription.plan === PLANS.PRO;
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -58,8 +64,8 @@ export const Header = ({
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-1.5">
-            <div className="mobile-brand-logo">
-              <img src="/psicoplus-logo.png" alt="PsicoPlus" />
+            <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs">
+              <HeartPulse size={14} />
             </div>
             <span className="font-bold text-sm text-slate-900 dark:text-white font-display">PsicoPlus</span>
           </div>
@@ -126,6 +132,26 @@ export const Header = ({
               <kbd className="hidden md:inline-block px-1.5 py-0.2 text-[10px] font-mono text-slate-400 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700">
                 ⌘K
               </kbd>
+            </button>
+          )}
+
+          {/* Upgrade / Pro Badge Trigger */}
+          {!isPro ? (
+            <button
+              onClick={onOpenUpgradeModal}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition-all animate-pulse"
+              title="Actualizar a PsicoPlus PRO"
+            >
+              <Sparkles size={13} className="text-amber-200" />
+              <span>Pasar a PRO</span>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenUpgradeModal}
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition-all hover:bg-emerald-900/60"
+              title="Ver estado de suscripción PRO"
+            >
+              <ProBadge text="PRO ACTIVO" size="xs" />
             </button>
           )}
 

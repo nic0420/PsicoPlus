@@ -15,13 +15,17 @@ import {
   PieChart
 } from 'lucide-react';
 
+import { ProBadge } from '../Common/ProBadge';
+
 export const FinanzasView = ({
   sedes,
   obrasSociales,
   pacientes,
   turnos,
   liquidaciones,
-  selectedSedeId
+  selectedSedeId,
+  subscription = { plan: 'free' },
+  onOpenUpgradeModal
 }) => {
   const [filterMedio, setFilterMedio] = useState('all');
 
@@ -84,6 +88,23 @@ export const FinanzasView = ({
             Balance general de cobros en consultorio/transferencias y liquidaciones de obras sociales.
           </p>
         </div>
+
+        <button
+          onClick={() => {
+            const isPro = subscription?.plan === 'pro';
+            if (!isPro) {
+              if (onOpenUpgradeModal) {
+                onOpenUpgradeModal('La exportación de reportes financieros a Excel y análisis de rentabilidad es una función exclusiva de PsicoPlus PRO.');
+              }
+              return;
+            }
+            alert('Generando reporte financiero en formato Excel...');
+          }}
+          className="btn btn-secondary text-xs flex items-center gap-1.5 self-start md:self-auto"
+        >
+          <span>Exportar Balance (Excel)</span>
+          {subscription?.plan !== 'pro' && <ProBadge size="xs" text="PRO" />}
+        </button>
       </div>
 
       {/* 4 Cards de Balance */}

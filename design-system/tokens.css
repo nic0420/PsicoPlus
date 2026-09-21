@@ -1,0 +1,82 @@
+/* PsicoPlus Design System — "Botanical Clinical"
+   Tokens extracted from src/index.css. Light is default; add .dark on <html> for dark mode. */
+
+:root {
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', var(--font-sans);
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;   /* base UI size: buttons, inputs */
+  --text-base: 0.9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  /* Brand */
+  --primary: #2d9a5f;
+  --primary-hover: #258a52;
+  --primary-dark: #1e7a45;
+  --primary-light: #e8f7ef;
+  --primary-gradient: linear-gradient(135deg, #2d9a5f 0%, #3ab876 60%, #6dd5a0 100%);
+  --secondary-gradient: linear-gradient(135deg, #162e1e 0%, #1e3d28 100%);
+
+  /* Semantic accents */
+  --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --danger-gradient: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  --warning-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+
+  /* Surfaces & text */
+  --bg-app: #f0f9f4;
+  --bg-card: #ffffff;
+  --bg-sidebar: #0d1f15;
+  --text-main: #0f2419;
+  --text-muted: #476353;
+  --text-light: #8faa9a;
+  --border-color: #d1e8da;
+  --border-subtle: #e8f5ee;
+
+  /* Pastel status pairs (background / text) */
+  --pastel-mint: #e8f7ef;   --pastel-mint-text: #166534;
+  --pastel-pink: #fff1f2;   --pastel-pink-text: #9f1239;
+  --pastel-sky: #f0f9ff;    --pastel-sky-text: #0369a1;
+  --pastel-amber: #fffbeb;  --pastel-amber-text: #92400e;
+
+  /* Spacing (4px scale) */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 22px; --space-6: 32px; --space-7: 48px;
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;   /* buttons, inputs */
+  --radius-lg: 20px;   /* cards */
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 3px rgba(0,0,0,.03), 0 4px 12px -2px rgba(15,36,25,.04);
+  --shadow-hover: 0 10px 25px -4px rgba(15,36,25,.08), 0 4px 10px -2px rgba(15,36,25,.04);
+  --shadow-glow-primary: 0 4px 20px rgba(45,154,95,.25);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.18s;
+  --dur-base: 0.22s;
+}
+
+.dark {
+  --bg-app: #060e09;
+  --bg-card: #0f1a14;
+  --bg-sidebar: #040a07;
+  --text-main: #e8f7ef;
+  --text-muted: #8faa9a;
+  --text-light: #5a7a6a;
+  --border-color: #1e3d28;
+  --border-subtle: #132a1c;
+  --pastel-mint: #0a2e1a;  --pastel-mint-text: #86efac;
+  --pastel-pink: #371424;  --pastel-pink-text: #fecdd3;
+  --pastel-sky: #082f49;   --pastel-sky-text: #bae6fd;
+  --pastel-amber: #451a03; --pastel-amber-text: #fef08a;
+  --shadow-card: 0 4px 20px -2px rgba(0,0,0,.5), 0 2px 6px -1px rgba(0,0,0,.4);
+  --shadow-hover: 0 12px 30px -4px rgba(0,0,0,.65), 0 4px 12px -2px rgba(45,154,95,.15);
+  --shadow-glow-primary: 0 0 25px rgba(45,154,95,.35);
+}

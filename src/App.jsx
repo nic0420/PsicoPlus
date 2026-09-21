@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { HeartPulse } from 'lucide-react';
 import { getStoredData, saveToStorage } from './services/storage';
+import { getSubscriptionData, saveSubscriptionData, PLANS } from './services/subscription';
+import { getCurrentUser, setCurrentUser, DEMO_USER } from './services/auth';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { DashboardView } from './components/Dashboard/DashboardView';
@@ -12,27 +14,44 @@ import { FinanzasView } from './components/Finanzas/FinanzasView';
 import { PortalTurnosView } from './components/PortalPacientes/PortalTurnosView';
 import { ConfiguracionView } from './components/Configuracion/ConfiguracionView';
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { ToastProvider } from './components/Common/Toast';
+import { ToastProvider, useToast } from './components/Common/Toast';
 import { CommandPalette } from './components/Common/CommandPalette';
-import { LoginScreen } from './components/Auth/LoginScreen';
+import { UpgradeModal } from './components/Common/UpgradeModal';
+import { AuthModal } from './components/Auth/AuthModal';
+import { LandingPage } from './components/Landing/LandingPage';
 import { supabase } from './lib/supabase';
 import './App.css';
 
 export function AppContent() {
   const initial = getStoredData();
 
-  // Detect query param ?portal=paciente
+  // Detect URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const isDirectPortal = urlParams.get('portal') === 'paciente' || urlParams.get('portal') === 'turnos' || urlParams.get('reserva') === 'true';
+  const isDirectLanding = urlParams.get('landing') === 'true';
 
-  const [activeTab, setActiveTab] = useState(isDirectPortal ? 'portal-pacientes' : 'dashboard');
+  // Navigation & View Mode
+  const [viewMode, setViewMode] = useState(
+    isDirectPortal ? 'portal-standalone' : isDirectLanding ? 'landing' : 'app'
+  );
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSedeId, setSelectedSedeId] = useState('all');
   const [privacyMode, setPrivacyMode] = useState(false);
-  // PsicoPlus uses a consistent dark workspace for visual comfort during long clinical sessions.
-  const [isDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(initial.theme === 'dark');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // User & Subscription state
+  const [currentUser, setCurUser] = useState(getCurrentUser());
+  const [subscription, setSubscription] = useState(getSubscriptionData());
+
+  // Modals state
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState('');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('register');
+
+  // Business Data state
   const [sedes, setSedes] = useState(initial.sedes);
   const [obrasSociales, setObrasSociales] = useState(initial.obrasSociales);
   const [pacientes, setPacientes] = useState(initial.pacientes);
@@ -41,7 +60,7 @@ export function AppContent() {
   const [facturas, setFacturas] = useState(initial.facturas || []);
   const [config, setConfig] = useState(initial.config);
 
-  // Modals state
+  // Detail / Form Modals state
   const [selectedPaciente, setSelectedPaciente] = useState(null);
   const [isTurnoModalOpen, setIsTurnoModalOpen] = useState(false);
   const [isPacienteModalOpen, setIsPacienteModalOpen] = useState(false);
@@ -58,7 +77,7 @@ export function AppContent() {
     }
   }, [isDarkMode]);
 
-  // Global Keyboard Shortcuts (Ctrl+K, N for new appointment, P for privacy)
+  // Global Keyboard Shortcuts (Ctrl+K)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -69,6 +88,63 @@ export function AppContent() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  const handleOpenUpgrade = (reason = '') => {
+    setUpgradeReason(reason);
+    setIsUpgradeModalOpen(true);
+  };
+
+  const handlePlanUpdated = (newSub) => {
+    setSubscription(newSub);
+    saveSubscriptionData(newSub);
+  };
+
+  const handleAuthSuccess = (user, isNewRegistration = false) => {
+    setCurUser(user);
+    setCurrentUser(user);
+
+    if (isNewRegistration) {
+      // Configure initial profile for the new psychologist
+      const newConfig = {
+        ...config,
+        nombre: user.nombre,
+        matriculaProvincial: user.matriculaProvincial || 'M.P. En trámite',
+        colegio: user.colegio || 'Colegio de Psicólogos',
+        telefono: user.telefono || config.telefono,
+        email: user.email,
+      };
+      setConfig(newConfig);
+      saveToStorage('psicoplus_config_v1', newConfig);
+
+      // Sede inicial del usuario
+      if (user.consultorioInicial?.nombre) {
+        const newSedes = [
+          {
+            id: `sede-${Date.now()}`,
+            nombre: user.consultorioInicial.nombre,
+            direccion: user.consultorioInicial.direccion,
+            diasAtencion: 'Lunes a Viernes',
+            color: '#0d9488',
+            badgeClass: 'badge-sede-centro',
+            icono: 'Building2',
+          }
+        ];
+        setSedes(newSedes);
+        saveToStorage('psicoplus_sedes_v1', newSedes);
+      }
+    }
+
+    setViewMode('app');
+    setActiveTab('dashboard');
+  };
+
+  const handleLogout = () => {
+    if (confirm('¿Deseas cerrar la sesión actual y volver a la página principal?')) {
+      setCurrentUser(DEMO_USER);
+      setCurUser(DEMO_USER);
+      setViewMode('landing');
+    }
+  };
 
   // Persist state updates to localStorage
   const handleSaveSedes = (newSedes) => {
@@ -200,28 +276,28 @@ export function AppContent() {
     saveToStorage('psicoplus_liquidaciones_v1', updated);
   };
 
-  // Contar pacientes con órdenes de Obra Social por agotar
+  // Counters
   const pacientesEnAlertaCount = pacientes.filter(p => {
     if (p.obraSocialId === 'particular') return false;
     const restantes = (p.sesionesAutorizadas || 10) - (p.sesionesConsumidas || 0);
     return restantes <= 2;
   }).length;
 
-  // Contar solicitudes web pendientes
   const turnosWebPendientesCount = turnos.filter(t => t.estado === 'Solicitado (Web)').length;
 
-  // If user opens directly in patient portal URL mode
-  if (isDirectPortal && activeTab === 'portal-pacientes') {
+  // Render 1: Standalone Patient Portal Mode
+  if (viewMode === 'portal-standalone') {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#080c14] p-3 sm:p-6 md:p-8 flex flex-col justify-between">
         <div className="w-full max-w-3xl mx-auto flex items-center justify-between mb-4">
-          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold">Portal Pacientes • PsicoPlus</span>
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Portal Pacientes • PsicoPlus</span>
           <button
             onClick={() => {
               window.history.pushState({}, '', window.location.pathname);
+              setViewMode('app');
               setActiveTab('dashboard');
             }}
-            className="text-xs text-slate-500 hover:text-indigo-600 font-medium"
+            className="text-xs text-slate-500 hover:text-emerald-600 font-medium"
           >
             Acceso Profesional →
           </button>
@@ -241,20 +317,57 @@ export function AppContent() {
     );
   }
 
+  // Render 2: Landing Page View
+  if (viewMode === 'landing') {
+    return (
+      <>
+        <LandingPage
+          onStartFree={() => {
+            setAuthModalMode('register');
+            setIsAuthModalOpen(true);
+          }}
+          onLogin={() => {
+            setAuthModalMode('login');
+            setIsAuthModalOpen(true);
+          }}
+          onOpenDemo={() => {
+            setCurUser(DEMO_USER);
+            setViewMode('app');
+            setActiveTab('dashboard');
+          }}
+          onGoToPortal={() => setViewMode('portal-standalone')}
+        />
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          initialMode={authModalMode}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      </>
+    );
+  }
+
+  // Render 3: Main Professional App View
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-[#080c14] text-slate-900 dark:text-slate-100 transition-colors">
       
-      {/* Sidebar Navigation (Desktop & Mobile Slide-over Drawer) */}
+      {/* Sidebar Navigation */}
       <Sidebar 
         activeTab={activeTab} 
         onTabChange={(tab) => {
           setActiveTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        config={config} 
+        config={config}
+        subscription={subscription}
+        pacientesCount={pacientes.length}
         turnosWebPendientesCount={turnosWebPendientesCount}
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        onOpenUpgradeModal={() => handleOpenUpgrade()}
+        onOpenLanding={() => setViewMode('landing')}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -275,7 +388,9 @@ export function AppContent() {
           onNavigateAgenda={() => setActiveTab('agenda')}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
-          onSignOut={() => supabase?.auth.signOut()}
+          subscription={subscription}
+          onOpenUpgradeModal={() => handleOpenUpgrade()}
+          onSignOut={handleLogout}
         />
 
         <main className="flex-1 p-3.5 sm:p-6 md:p-8 pb-28 md:pb-8 max-w-7xl w-full mx-auto">
@@ -344,6 +459,8 @@ export function AppContent() {
                 setFacturaPreselectedPaciente(pac);
                 setActiveTab('facturas');
               }}
+              subscription={subscription}
+              onOpenUpgradeModal={handleOpenUpgrade}
             />
           )}
 
@@ -369,6 +486,8 @@ export function AppContent() {
               onSaveLiquidacion={handleSaveLiquidacion}
               onUpdateLiquidacionEstado={handleUpdateLiquidacionEstado}
               onDeleteLiquidacion={handleDeleteLiquidacion}
+              subscription={subscription}
+              onOpenUpgradeModal={handleOpenUpgrade}
             />
           )}
 
@@ -380,6 +499,8 @@ export function AppContent() {
               turnos={turnos}
               liquidaciones={liquidaciones}
               selectedSedeId={selectedSedeId}
+              subscription={subscription}
+              onOpenUpgradeModal={handleOpenUpgrade}
             />
           )}
 
@@ -402,8 +523,11 @@ export function AppContent() {
               config={config}
               sedes={sedes}
               obrasSociales={obrasSociales}
+              subscription={subscription}
               onSaveConfig={handleSaveConfig}
               onSaveSedes={handleSaveSedes}
+              onOpenUpgradeModal={handleOpenUpgrade}
+              onSubscriptionUpdated={handlePlanUpdated}
             />
           )}
         </main>
@@ -442,50 +566,27 @@ export function AppContent() {
         onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       />
 
-    </div>
-  );
-}
+      {/* Global Upgrade to PRO Modal */}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        featureReason={upgradeReason}
+        onPlanUpdated={handlePlanUpdated}
+      />
 
-function AuthLoadingScreen() {
-  return (
-    <div className="auth-loading" role="status" aria-live="polite">
-      <div className="brand-mark"><HeartPulse size={22} /></div>
-      <span>Preparando tu espacio seguro…</span>
+      {/* Global Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
+        onAuthSuccess={handleAuthSuccess}
+      />
+
     </div>
   );
 }
 
 export function App() {
-  const [session, setSession] = useState(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const isPublicPortal = new URLSearchParams(window.location.search).get('portal') === 'paciente' || new URLSearchParams(window.location.search).get('portal') === 'turnos' || new URLSearchParams(window.location.search).get('reserva') === 'true';
-
-  useEffect(() => {
-    if (!supabase) {
-      setIsAuthLoading(false);
-      return undefined;
-    }
-
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted) {
-        setSession(data.session);
-        setIsAuthLoading(false);
-      }
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setIsAuthLoading(false);
-    });
-    return () => {
-      mounted = false;
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  if (isAuthLoading && !isPublicPortal) return <AuthLoadingScreen />;
-  if (!session && !isPublicPortal) return <LoginScreen onAuthenticated={setSession} />;
-
   return (
     <ToastProvider>
       <AppContent />

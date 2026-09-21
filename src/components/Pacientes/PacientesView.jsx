@@ -38,7 +38,9 @@ export const PacientesView = ({
   isCreateModalOpen,
   onOpenCreateModal,
   onCloseCreateModal,
-  onNavigateFacturar
+  onNavigateFacturar,
+  subscription = { plan: 'free' },
+  onOpenUpgradeModal
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOS, setFilterOS] = useState('all');
@@ -102,6 +104,14 @@ export const PacientesView = ({
   });
 
   const handleOpenCreate = () => {
+    const isPro = subscription?.plan === 'pro';
+    if (!isPro && pacientes.length >= 15) {
+      if (onOpenUpgradeModal) {
+        onOpenUpgradeModal('Has alcanzado el límite de 15 pacientes del Plan Inicial Gratuito. Desbloqueá PsicoPlus PRO para gestionar pacientes ilimitados.');
+      }
+      return;
+    }
+
     setFormData({
       nombreCompleto: '',
       dni: '',
