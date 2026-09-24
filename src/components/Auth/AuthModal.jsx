@@ -45,12 +45,12 @@ export const AuthModal = ({
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       if (mode === 'register') {
         if (!formData.nombre.trim() || !formData.email.trim() || !formData.password.trim()) {
           setError('Por favor completá los campos obligatorios (Nombre, Email y Contraseña).');
@@ -58,7 +58,7 @@ export const AuthModal = ({
           return;
         }
 
-        const res = registerUser(formData);
+        const res = await registerUser(formData);
         setLoading(false);
 
         if (res.success) {
@@ -70,7 +70,7 @@ export const AuthModal = ({
         }
       } else {
         // Login
-        const res = loginUser(formData.email, formData.password);
+        const res = await loginUser(formData.email, formData.password);
         setLoading(false);
 
         if (res.success) {
@@ -81,7 +81,11 @@ export const AuthModal = ({
           setError(res.error);
         }
       }
-    }, 400);
+    } catch (err) {
+      console.error('Error en autenticación:', err);
+      setError('Ocurrió un error inesperado al procesar la solicitud.');
+      setLoading(false);
+    }
   };
 
   const handleDemoAccess = () => {

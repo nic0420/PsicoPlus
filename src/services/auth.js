@@ -1,4 +1,4 @@
-// Servicio de autenticación y cuentas de psicólogos para PsicoPlus
+import { hashPassword, verifyPassword } from './securityService';
 
 const STORAGE_KEYS = {
   CURRENT_USER: 'psicoplus_current_user_v1',
@@ -47,7 +47,7 @@ export const getRegisteredUsers = () => {
   }
 };
 
-export const registerUser = ({
+export const registerUser = async ({
   nombre,
   email,
   password,
@@ -65,11 +65,14 @@ export const registerUser = ({
     return { success: false, error: 'Ya existe una cuenta registrada con este correo electrónico.' };
   }
 
+  // Cifrado criptográfico de la contraseña antes de guardar en almacenamiento
+  const passwordHash = await hashPassword(password);
+
   const newUser = {
     id: `user-${Date.now()}`,
     nombre: nombre.trim(),
     email: normalizedEmail,
-    password, // Stored in local DB for offline SaaS
+    passwordHash, // Protegido con hash SHA-256
     titulo: 'Licenciado/a en Psicología',
     matriculaProvincial: matriculaProvincial?.trim() || 'M.P. En trámite',
     colegio: colegio?.trim() || 'Colegio de Psicólogos',
@@ -90,10 +93,10 @@ export const registerUser = ({
   return { success: true, user: newUser };
 };
 
-export const loginUser = (email, password) => {
+export const loginUser = async (email, password) => {
   const normalizedEmail = (email || '').trim().toLowerCase();
   
-  // Allow demo login
+  // Acceso de demostración
   if (normalizedEmail === DEMO_USER.email.toLowerCase()) {
     setCurrentUser(DEMO_USER);
     return { success: true, user: DEMO_USER };
@@ -106,8 +109,19 @@ export const loginUser = (email, password) => {
     return { success: false, error: 'No se encontró ninguna cuenta con este correo.' };
   }
 
-  if (found.password && found.password !== password) {
+  // Verificación con hash o migración automática
+  const storedHash = found.passwordHash || found.password;
+  const isMatch = await verifyPassword(password, storedHash);
+
+  if (!isMatch) {
     return { success: false, error: 'Contraseña incorrecta.' };
+  }
+
+  // Si tenía contraseña vieja sin hash, migrarla a hash SHA-256
+  if (!found.passwordHash) {
+    found.passwordHash = await hashPassword(password);
+    delete found.password;
+    localStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(users));
   }
 
   setCurrentUser(found);

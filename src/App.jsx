@@ -19,6 +19,8 @@ import { CommandPalette } from './components/Common/CommandPalette';
 import { UpgradeModal } from './components/Common/UpgradeModal';
 import { AuthModal } from './components/Auth/AuthModal';
 import { LandingPage } from './components/Landing/LandingPage';
+import { LegalModal } from './components/Legal/LegalModal';
+import { CookieConsentBanner } from './components/Common/CookieConsentBanner';
 import { supabase } from './lib/supabase';
 import './App.css';
 
@@ -50,6 +52,13 @@ export function AppContent() {
   const [upgradeReason, setUpgradeReason] = useState('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('register');
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalModalTab, setLegalModalTab] = useState('terminos');
+
+  const handleOpenLegal = (tab = 'terminos') => {
+    setLegalModalTab(tab);
+    setIsLegalModalOpen(true);
+  };
 
   // Business Data state
   const [sedes, setSedes] = useState(initial.sedes);
@@ -336,6 +345,7 @@ export function AppContent() {
             setActiveTab('dashboard');
           }}
           onGoToPortal={() => setViewMode('portal-standalone')}
+          onOpenLegal={handleOpenLegal}
         />
 
         <AuthModal
@@ -344,6 +354,14 @@ export function AppContent() {
           initialMode={authModalMode}
           onAuthSuccess={handleAuthSuccess}
         />
+
+        <LegalModal
+          isOpen={isLegalModalOpen}
+          onClose={() => setIsLegalModalOpen(false)}
+          initialTab={legalModalTab}
+        />
+
+        <CookieConsentBanner onOpenLegal={handleOpenLegal} />
       </>
     );
   }
@@ -368,6 +386,7 @@ export function AppContent() {
         onOpenUpgradeModal={() => handleOpenUpgrade()}
         onOpenLanding={() => setViewMode('landing')}
         onLogout={handleLogout}
+        onOpenLegal={handleOpenLegal}
       />
 
       {/* Main Content Area */}
@@ -528,6 +547,7 @@ export function AppContent() {
               onSaveSedes={handleSaveSedes}
               onOpenUpgradeModal={handleOpenUpgrade}
               onSubscriptionUpdated={handlePlanUpdated}
+              onOpenLegal={handleOpenLegal}
             />
           )}
         </main>
@@ -581,6 +601,16 @@ export function AppContent() {
         initialMode={authModalMode}
         onAuthSuccess={handleAuthSuccess}
       />
+
+      {/* Global Legal & Privacy Modal (Ley 25.326 & ARCA) */}
+      <LegalModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
+        initialTab={legalModalTab}
+      />
+
+      {/* Global Cookie Consent Banner */}
+      <CookieConsentBanner onOpenLegal={handleOpenLegal} />
 
     </div>
   );

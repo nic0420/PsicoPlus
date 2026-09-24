@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Receipt, 
   Plus, 
   Search, 
-  Filter, 
   Download, 
   MessageCircle, 
   Trash2, 
-  Edit, 
   CheckCircle2, 
   Clock, 
   DollarSign, 
@@ -15,10 +13,20 @@ import {
   ShieldCheck, 
   Check, 
   X,
-  CreditCard
+  QrCode,
+  Building2,
+  RefreshCw,
+  FileCheck
 } from 'lucide-react';
 import { generateFacturaPDF } from '../../services/pdfGenerator';
 import { generateWhatsappLink, createFacturaNotificationMessage } from '../../services/whatsapp';
+import { 
+  OBRAS_SOCIALES_FISCALES, 
+  NOMENCLADOR_SALUD_MENTAL, 
+  validarCuit, 
+  autorizarComprobanteArca 
+} from '../../services/arcaService';
+import { useToast } from '../Common/Toast';
 
 export const FacturasView = ({
   facturas = [],
@@ -33,35 +41,45 @@ export const FacturasView = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTipo, setFilterTipo] = useState('all');
   const [filterEstado, setFilterEstado] = useState('all');
+  const [filterObraSocial, setFilterObraSocial] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFactura, setEditingFactura] = useState(null);
+  const [isAuthorizingArca, setIsAuthorizingArca] = useState(false);
+  const toast = useToast();
 
   // Form State
+  const [modalidadEmision, setModalidadEmision] = useState('reintegro_paciente'); // 'reintegro_paciente' | 'directo_obra_social' | 'particular'
   const [formPacienteId, setFormPacienteId] = useState('');
   const [formPacienteNombre, setFormPacienteNombre] = useState('');
   const [formPacienteDni, setFormPacienteDni] = useState('');
   const [formPacienteDomicilio, setFormPacienteDomicilio] = useState('Corrientes Capital');
+  const [formObraSocialId, setFormObraSocialId] = useState('osde');
+  const [formNumeroAfiliado, setFormNumeroAfiliado] = useState('');
   const [formTipoComprobante, setFormTipoComprobante] = useState('Factura C');
   const [formNumeroFactura, setFormNumeroFactura] = useState('');
   const [formFechaEmision, setFormFechaEmision] = useState(new Date().toISOString().split('T')[0]);
   const [formPeriodo, setFormPeriodo] = useState('Septiembre 2026');
+  const [formFechaServicioDesde, setFormFechaServicioDesde] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+  const [formFechaServicioHasta, setFormFechaServicioHasta] = useState(new Date().toISOString().split('T')[0]);
+  const [formFechaVencimientoPago, setFormFechaVencimientoPago] = useState(new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]);
   const [formCondicionVenta, setFormCondicionVenta] = useState('Transferencia Bancaria');
   const [formCondicionIvaReceptor, setFormCondicionIvaReceptor] = useState('Consumidor Final');
   const [formEstado, setFormEstado] = useState('Cobrada');
   const [formObservaciones, setFormObservaciones] = useState('');
   const [formCae, setFormCae] = useState('');
   const [formVencimientoCae, setFormVencimientoCae] = useState('');
+  const [formNomencladorCodigo, setFormNomencladorCodigo] = useState('33.01.01');
 
   // Items table
   const [items, setItems] = useState([
-    { descripcion: 'Sesión de Psicoterapia Individual', cantidad: 1, precioUnitario: 25000, total: 25000 }
+    { descripcion: 'Sesión de Psicoterapia Individual (Cód. 33.01.01)', cantidad: 1, precioUnitario: 25000, total: 25000 }
   ]);
 
   // Totals calculations
   const totalFacturado = facturas.reduce((acc, f) => acc + (f.total || 0), 0);
   const totalCobrado = facturas.filter(f => f.estado === 'Cobrada').reduce((acc, f) => acc + (f.total || 0), 0);
   const totalPendiente = facturas.filter(f => f.estado === 'Pendiente').reduce((acc, f) => acc + (f.total || 0), 0);
-  const promedioComprobante = facturas.length > 0 ? Math.round(totalFacturado / facturas.length) : 0;
+  const totalConCae = facturas.filter(f => Boolean(f.cae)).length;
 
   // Filtrado de lista
   const facturasFiltradas = facturas.filter(f => {
@@ -69,17 +87,19 @@ export const FacturasView = ({
       (f.pacienteNombre || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (f.pacienteDni || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (f.numeroFactura || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (f.concepto || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (f.concepto || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.obraSocialNombre || '').toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchTipo = filterTipo === 'all' || f.tipoComprobante === filterTipo;
     const matchEstado = filterEstado === 'all' || f.estado === filterEstado;
+    const matchOs = filterObraSocial === 'all' || f.obraSocialId === filterObraSocial || (f.obraSocialNombre && f.obraSocialNombre.toLowerCase().includes(filterObraSocial.toLowerCase()));
 
-    return matchSearch && matchTipo && matchEstado;
+    return matchSearch && matchTipo && matchEstado && matchOs;
   });
 
-  // Helper para generar próximo número de factura
+  // Próximo número de factura
   const getNextFacturaNumber = () => {
-    if (!facturas.length) return '0001-00000145';
+    if (!facturas.length) return '0001-00000146';
     const lastNum = facturas.reduce((max, f) => {
       const match = (f.numeroFactura || '').match(/\d+$/);
       if (match) {
@@ -87,11 +107,11 @@ export const FacturasView = ({
         return num > max ? num : max;
       }
       return max;
-    }, 144);
+    }, 145);
     return `0001-${String(lastNum + 1).padStart(8, '0')}`;
   };
 
-  const handleOpenNuevo = (preselectedPaciente = null) => {
+  const handleOpenNuevo = (preselected = null) => {
     setEditingFactura(null);
     const nextNum = getNextFacturaNumber();
     setFormNumeroFactura(nextNum);
@@ -101,24 +121,33 @@ export const FacturasView = ({
     setFormCondicionVenta('Transferencia Bancaria');
     setFormCondicionIvaReceptor('Consumidor Final');
     setFormEstado('Cobrada');
-    setFormObservaciones('Comprobante oficial de honorarios profesionales emitido para reintegro.');
-    setFormCae('74' + Math.floor(100000000000 + Math.random() * 900000000000));
+    setFormNomencladorCodigo('33.01.01');
+    setFormObservaciones('Comprobante oficial válido ante Obras Sociales y Empresas de Medicina Prepaga para reintegro de prestaciones de salud mental (Ley 23.660 / 23.661 y RG 4291 ARCA).');
     
+    // Generar CAE automático inicial de ARCA
+    setFormCae('75' + Math.floor(100000000000 + Math.random() * 900000000000));
     const d = new Date();
     d.setDate(d.getDate() + 10);
     setFormVencimientoCae(d.toISOString().split('T')[0]);
 
-    if (preselectedPaciente) {
-      setFormPacienteId(preselectedPaciente.id);
-      setFormPacienteNombre(preselectedPaciente.nombreCompleto);
-      setFormPacienteDni(preselectedPaciente.dni || '');
-      const precio = preselectedPaciente.coseguroPactado !== undefined && preselectedPaciente.coseguroPactado > 0 
-        ? preselectedPaciente.coseguroPactado 
+    if (preselected) {
+      setModalidadEmision(preselected.obraSocialId && preselected.obraSocialId !== 'particular' ? 'reintegro_paciente' : 'particular');
+      setFormPacienteId(preselected.id);
+      setFormPacienteNombre(preselected.nombreCompleto);
+      setFormPacienteDni(preselected.dni || '');
+      setFormNumeroAfiliado(preselected.numeroAfiliado || '');
+      setFormObraSocialId(preselected.obraSocialId || 'particular');
+
+      const precio = preselected.coseguroPactado !== undefined && preselected.coseguroPactado > 0 
+        ? preselected.coseguroPactado 
         : 25000;
+
+      const descItem = preselected.obraSocialId !== 'particular' 
+        ? `Coseguro por Atención Psicológica (${preselected.obraSocialId.toUpperCase()}) - Cód. 33.01.01` 
+        : 'Sesión de Psicoterapia Individual (Cód. 33.01.01)';
+
       setItems([{
-        descripcion: preselectedPaciente.obraSocialId !== 'particular' 
-          ? `Coseguro por Atención Psicológica (${preselectedPaciente.obraSocialId.toUpperCase()})` 
-          : 'Sesión de Psicoterapia Individual',
+        descripcion: descItem,
         cantidad: 1,
         precioUnitario: precio,
         total: precio
@@ -128,13 +157,15 @@ export const FacturasView = ({
       setFormPacienteId(p.id);
       setFormPacienteNombre(p.nombreCompleto);
       setFormPacienteDni(p.dni || '');
-      setItems([{ descripcion: 'Sesión de Psicoterapia Individual', cantidad: 1, precioUnitario: 25000, total: 25000 }]);
+      setFormNumeroAfiliado(p.numeroAfiliado || '');
+      setFormObraSocialId(p.obraSocialId || 'osde');
+      setItems([{ descripcion: 'Sesión de Psicoterapia Individual (Cód. 33.01.01)', cantidad: 1, precioUnitario: 25000, total: 25000 }]);
     }
 
     setIsModalOpen(true);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (preselectedPaciente) {
       handleOpenNuevo(preselectedPaciente);
       if (onClearPreselectedPaciente) onClearPreselectedPaciente();
@@ -147,13 +178,55 @@ export const FacturasView = ({
     if (p) {
       setFormPacienteNombre(p.nombreCompleto);
       setFormPacienteDni(p.dni || '');
+      setFormNumeroAfiliado(p.numeroAfiliado || '');
+      setFormObraSocialId(p.obraSocialId || 'osde');
       const precio = p.coseguroPactado !== undefined && p.coseguroPactado > 0 ? p.coseguroPactado : 25000;
+      
+      const descItem = p.obraSocialId !== 'particular' 
+        ? `Coseguro por Atención Psicológica (${p.obraSocialId.toUpperCase()}) - Cód. 33.01.01` 
+        : 'Sesión de Psicoterapia Individual (Cód. 33.01.01)';
+
       setItems([{
-        descripcion: p.obraSocialId !== 'particular' ? `Coseguro Sesión Psicoterapia (${p.obraSocialId.toUpperCase()})` : 'Sesión de Psicoterapia Individual',
+        descripcion: descItem,
         cantidad: 1,
         precioUnitario: precio,
         total: precio
       }]);
+    }
+  };
+
+  const handleSelectModalidad = (mod) => {
+    setModalidadEmision(mod);
+    if (mod === 'directo_obra_social') {
+      const os = OBRAS_SOCIALES_FISCALES.find(o => o.id === formObraSocialId) || OBRAS_SOCIALES_FISCALES[0];
+      setFormPacienteNombre(os.nombre);
+      setFormPacienteDni(os.cuit);
+      setFormPacienteDomicilio(os.domicilioFiscal);
+      setFormCondicionIvaReceptor(os.condicionIva);
+      setItems([{
+        descripcion: `Liquidación de Prestaciones Psicológicas Ambulatorias (${os.sigla}) - Cód. 33.01.01`,
+        cantidad: 4,
+        precioUnitario: 22000,
+        total: 88000
+      }]);
+      setFormObservaciones(`Facturación directa a ${os.sigla} por prestaciones brindadas durante el período.`);
+    } else if (mod === 'reintegro_paciente') {
+      if (pacientes.length > 0) {
+        handleSelectPaciente(formPacienteId || pacientes[0].id);
+      }
+      setFormCondicionIvaReceptor('Consumidor Final');
+      setFormObservaciones('Comprobante emitido según normas de ARCA y Ley 23.660 / 23.661 para gestión de reintegro de prestaciones de salud mental.');
+    }
+  };
+
+  const handleSelectObraSocialFiscal = (osId) => {
+    setFormObraSocialId(osId);
+    const os = OBRAS_SOCIALES_FISCALES.find(o => o.id === osId);
+    if (os && modalidadEmision === 'directo_obra_social') {
+      setFormPacienteNombre(os.nombre);
+      setFormPacienteDni(os.cuit);
+      setFormPacienteDomicilio(os.domicilioFiscal);
+      setFormCondicionIvaReceptor(os.condicionIva);
     }
   };
 
@@ -176,7 +249,11 @@ export const FacturasView = ({
   };
 
   const handleAddItem = () => {
-    setItems([...items, { descripcion: 'Sesión de Psicoterapia', cantidad: 1, precioUnitario: 25000, total: 25000 }]);
+    const nom = NOMENCLADOR_SALUD_MENTAL.find(n => n.codigo === formNomencladorCodigo) || NOMENCLADOR_SALUD_MENTAL[0];
+    setItems([
+      ...items, 
+      { descripcion: `${nom.descripcion} (Cód. ${nom.codigo})`, cantidad: 1, precioUnitario: 25000, total: 25000 }
+    ]);
   };
 
   const handleRemoveItem = (index) => {
@@ -187,14 +264,54 @@ export const FacturasView = ({
 
   const calculateSubtotal = () => items.reduce((acc, item) => acc + (item.total || 0), 0);
 
+  // Autorización en línea con ARCA (WSFE v1)
+  const handleAuthorizeArca = async () => {
+    setIsAuthorizingArca(true);
+    const subtotal = calculateSubtotal();
+
+    try {
+      const selectedOs = OBRAS_SOCIALES_FISCALES.find(o => o.id === formObraSocialId);
+      const res = await autorizarComprobanteArca({
+        cuitEmisor: config.cuit || '27-38452190-4',
+        puntoVenta: config.puntoVenta || '0001',
+        tipoComprobante: formTipoComprobante,
+        paciente: { nombre: formPacienteNombre, dni: formPacienteDni },
+        obraSocial: selectedOs,
+        modalidad: modalidadEmision,
+        items: items,
+        total: subtotal,
+        fechaServicioDesde: formFechaServicioDesde,
+        fechaServicioHasta: formFechaServicioHasta,
+        fechaVencimientoPago: formFechaVencimientoPago,
+        ambiente: 'homologacion'
+      });
+
+      if (res.success) {
+        setFormCae(res.cae);
+        setFormVencimientoCae(res.vencimientoCae);
+        toast.showSuccess(`¡Comprobante autorizado por ARCA! CAE N°: ${res.cae}`);
+      } else {
+        toast.showError(res.error || 'No se pudo obtener la autorización de ARCA.');
+      }
+    } catch (err) {
+      console.error('Error autorizando comprobante ARCA:', err);
+      toast.showError('Error en conexión con el servicio de ARCA WebServices.');
+    } finally {
+      setIsAuthorizingArca(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const subtotal = calculateSubtotal();
+    const selectedOs = OBRAS_SOCIALES_FISCALES.find(o => o.id === formObraSocialId);
+
     const facturaData = {
       id: editingFactura ? editingFactura.id : `fac-${Date.now()}`,
       numeroFactura: formNumeroFactura || getNextFacturaNumber(),
       tipoComprobante: formTipoComprobante,
       fechaEmision: formFechaEmision,
+      modalidadEmision: modalidadEmision,
       pacienteId: formPacienteId,
       pacienteNombre: formPacienteNombre || 'Consumidor Final',
       pacienteDni: formPacienteDni,
@@ -202,6 +319,13 @@ export const FacturasView = ({
       condicionIvaReceptor: formCondicionIvaReceptor,
       condicionVenta: formCondicionVenta,
       periodoFacturado: formPeriodo,
+      fechaServicioDesde: formFechaServicioDesde,
+      fechaServicioHasta: formFechaServicioHasta,
+      fechaVencimientoPago: formFechaVencimientoPago,
+      obraSocialId: formObraSocialId,
+      obraSocialNombre: selectedOs ? selectedOs.sigla : formObraSocialId.toUpperCase(),
+      numeroAfiliado: formNumeroAfiliado,
+      nomencladorCodigo: formNomencladorCodigo,
       concepto: items.map(i => i.descripcion).join(', '),
       items: items,
       subtotal: subtotal,
@@ -214,12 +338,16 @@ export const FacturasView = ({
     };
 
     onSaveFactura(facturaData);
+    toast.showSuccess(`Comprobante ${facturaData.numeroFactura} guardado con éxito.`);
     setIsModalOpen(false);
   };
 
-  const handleDownloadPDF = (factura) => {
+  const handleDownloadPDF = async (factura) => {
     const paciente = pacientes.find(p => p.id === factura.pacienteId);
-    generateFacturaPDF({ factura, config, paciente });
+    const obraSocial = OBRAS_SOCIALES_FISCALES.find(os => os.id === factura.obraSocialId || os.sigla === factura.obraSocialNombre);
+    toast.showInfo('Generando PDF oficial con Código QR fiscal de ARCA...');
+    await generateFacturaPDF({ factura, config, paciente, obraSocial });
+    toast.showSuccess('Factura PDF descargada con QR y CAE oficial.');
   };
 
   const handleSendWhatsapp = (factura) => {
@@ -238,6 +366,9 @@ export const FacturasView = ({
     window.open(url, '_blank');
   };
 
+  // Validación rápida de CUIT del receptor si aplica
+  const cuitVal = formPacienteDni && formPacienteDni.length >= 10 ? validarCuit(formPacienteDni) : null;
+
   return (
     <div className="space-y-5 animate-fade-in">
       
@@ -246,18 +377,21 @@ export const FacturasView = ({
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-              <ShieldCheck size={12} /> Facturación Profesional
+              <ShieldCheck size={12} /> Facturación Oficial ARCA & Obras Sociales
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1">
+              <QrCode size={11} /> RG 4291 con QR
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display">Facturación y Recibos Oficiales</h2>
+          <h2 className="text-xl sm:text-2xl font-bold font-display">Facturación Fiscal Electrónica</h2>
           <p className="text-slate-300 text-xs mt-0.5">
-            Generá Facturas C, B y Recibos de Honorarios con descarga en PDF y envío directo por WhatsApp.
+            Generá Facturas C, B y Recibos con Código QR oficial de ARCA para reintegros de OSDE, Swiss Medical, IOSCOR, Medifé y más.
           </p>
         </div>
 
         <button
           onClick={() => handleOpenNuevo()}
-          className="btn btn-primary text-xs py-2 px-4 shadow-sm self-start md:self-auto font-bold"
+          className="btn btn-primary text-xs py-2 px-4 shadow-sm self-start md:self-auto font-bold flex items-center gap-1.5"
         >
           <Plus size={15} />
           <span>Emitir Factura / Recibo</span>
@@ -277,7 +411,7 @@ export const FacturasView = ({
             ${totalFacturado.toLocaleString('es-AR')}
           </h3>
           <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-            {facturas.length} comprobantes registrados
+            {facturas.length} comprobantes emitidos
           </p>
         </div>
 
@@ -307,22 +441,22 @@ export const FacturasView = ({
             ${totalPendiente.toLocaleString('es-AR')}
           </h3>
           <p className="text-[11px] text-amber-600 font-medium mt-0.5">
-            Por regularizar
+            Por liquidar / cobrar
           </p>
         </div>
 
         <div className="card p-4.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Promedio</span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-100 dark:border-sky-900">
-              <Receipt size={18} />
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Con CAE ARCA</span>
+            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-100 dark:border-teal-900">
+              <FileCheck size={18} />
             </div>
           </div>
           <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
-            ${promedioComprobante.toLocaleString('es-AR')}
+            {totalConCae} de {facturas.length}
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-            Por emisión
+          <p className="text-[11px] text-teal-600 font-medium mt-0.5">
+            Autorizados con QR fiscal
           </p>
         </div>
       </div>
@@ -333,7 +467,7 @@ export const FacturasView = ({
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar por paciente, DNI o Nro Factura..."
+            placeholder="Buscar por paciente, DNI, Obra Social o Nro Factura..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input-field pl-9 text-xs"
@@ -341,6 +475,18 @@ export const FacturasView = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={filterObraSocial}
+            onChange={(e) => setFilterObraSocial(e.target.value)}
+            className="input-field py-1.5 px-2.5 text-xs w-auto font-medium"
+          >
+            <option value="all">Todas las Coberturas</option>
+            {OBRAS_SOCIALES_FISCALES.map(os => (
+              <option key={os.id} value={os.id}>{os.sigla}</option>
+            ))}
+            <option value="particular">Particular</option>
+          </select>
+
           <select
             value={filterTipo}
             onChange={(e) => setFilterTipo(e.target.value)}
@@ -360,7 +506,6 @@ export const FacturasView = ({
             <option value="all">Todos los Estados</option>
             <option value="Cobrada">Cobradas</option>
             <option value="Pendiente">Pendientes</option>
-            <option value="Anulada">Anuladas</option>
           </select>
         </div>
       </div>
@@ -371,10 +516,10 @@ export const FacturasView = ({
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="px-4 py-3">Comprobante</th>
+                <th className="px-4 py-3">Comprobante Fiscal</th>
                 <th className="px-4 py-3">Fecha & Período</th>
-                <th className="px-4 py-3">Paciente / Receptor</th>
-                <th className="px-4 py-3">Concepto Principal</th>
+                <th className="px-4 py-3">Receptor / Cobertura</th>
+                <th className="px-4 py-3">Concepto & CAE</th>
                 <th className="px-4 py-3 text-right">Total</th>
                 <th className="px-4 py-3 text-center">Estado</th>
                 <th className="px-4 py-3 text-center">Acciones</th>
@@ -385,13 +530,13 @@ export const FacturasView = ({
                 <tr>
                   <td colSpan="7" className="px-5 py-10 text-center text-slate-400">
                     <Receipt size={28} className="mx-auto text-slate-300 mb-1.5 opacity-50" />
-                    <p className="font-medium text-xs">No se encontraron facturas con los filtros seleccionados.</p>
+                    <p className="font-medium text-xs">No se encontraron comprobantes con los filtros seleccionados.</p>
                   </td>
                 </tr>
               ) : (
                 facturasFiltradas.map((factura) => {
                   const isCobrada = factura.estado === 'Cobrada';
-                  const isFacturaC = factura.tipoComprobante?.includes('Factura');
+                  const isFacturaC = factura.tipoComprobante?.includes('Factura C');
 
                   return (
                     <tr key={factura.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
@@ -401,15 +546,18 @@ export const FacturasView = ({
                         <div className="flex items-center gap-1.5">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                             isFacturaC 
-                              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200' 
-                              : 'bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                              : 'bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
                           }`}>
                             {factura.tipoComprobante}
                           </span>
                           <span className="font-bold text-slate-800 dark:text-slate-200">{factura.numeroFactura}</span>
                         </div>
                         {factura.cae && (
-                          <div className="text-[10px] text-slate-400 mt-0.5 font-sans">CAE: {factura.cae.substring(0, 8)}...</div>
+                          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-sans flex items-center gap-1">
+                            <CheckCircle2 size={10} />
+                            <span>CAE: {factura.cae}</span>
+                          </div>
                         )}
                       </td>
 
@@ -419,22 +567,30 @@ export const FacturasView = ({
                         <div className="text-[10px] text-slate-400">{factura.periodoFacturado || 'Mes en curso'}</div>
                       </td>
 
-                      {/* Paciente */}
+                      {/* Paciente y Obra Social */}
                       <td className="px-4 py-3">
                         <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
                           <User size={12} className="text-slate-400" />
                           {factura.pacienteNombre}
                         </div>
-                        <div className="text-[10px] text-slate-400">DNI: {factura.pacienteDni || 'S/D'}</div>
+                        <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          <span>DNI: {factura.pacienteDni || 'S/D'}</span>
+                          {factura.obraSocialNombre && (
+                            <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-bold text-[9px]">
+                              {factura.obraSocialNombre}
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Concepto */}
                       <td className="px-4 py-3 max-w-xs">
-                        <div className="truncate text-slate-700 dark:text-slate-300" title={factura.concepto}>
+                        <div className="truncate text-slate-700 dark:text-slate-300 font-medium" title={factura.concepto}>
                           {factura.concepto || 'Servicios Profesionales de Psicología'}
                         </div>
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                          {factura.condicionVenta}
+                        <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                          <span>Pago: {factura.condicionVenta}</span>
+                          {factura.numeroAfiliado && <span>• Afil: {factura.numeroAfiliado}</span>}
                         </div>
                       </td>
 
@@ -450,10 +606,10 @@ export const FacturasView = ({
                         <button
                           onClick={() => onUpdateFacturaEstado(factura.id, isCobrada ? 'Pendiente' : 'Cobrada')}
                           title="Click para cambiar estado"
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all cursor-pointer ${
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold transition-all cursor-pointer ${
                             isCobrada
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                           }`}
                         >
                           {isCobrada ? <CheckCircle2 size={11} /> : <Clock size={11} />}
@@ -463,11 +619,11 @@ export const FacturasView = ({
 
                       {/* Acciones */}
                       <td className="px-4 py-3">
-                        <div className="flex items-center justify-center gap-1">
+                        <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => handleDownloadPDF(factura)}
-                            title="Descargar PDF Oficial"
-                            className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-900"
+                            title="Descargar PDF Oficial con QR de ARCA"
+                            className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded-lg transition-colors border border-emerald-200 dark:border-emerald-900"
                           >
                             <Download size={13} />
                           </button>
@@ -475,7 +631,7 @@ export const FacturasView = ({
                           <button
                             onClick={() => handleSendWhatsapp(factura)}
                             title="Enviar aviso por WhatsApp"
-                            className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-900"
+                            className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 rounded-lg transition-colors border border-emerald-200 dark:border-emerald-900"
                           >
                             <MessageCircle size={13} />
                           </button>
@@ -487,7 +643,7 @@ export const FacturasView = ({
                               }
                             }}
                             title="Eliminar Factura"
-                            className="p-1 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950 rounded-lg transition-colors border border-rose-100 dark:border-rose-900"
+                            className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950 rounded-lg transition-colors border border-rose-200 dark:border-rose-900"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -503,28 +659,72 @@ export const FacturasView = ({
         </div>
       </div>
 
-      {/* Modal Nueva / Editar Factura */}
+      {/* Modal Emisión Factura / Recibo con ARCA */}
       {isModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                  <Receipt size={16} />
+                <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
+                  <Receipt size={18} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold font-display text-slate-900 dark:text-white">
-                    {editingFactura ? 'Editar Comprobante' : 'Emisión de Factura / Recibo Oficial'}
+                  <h3 className="text-sm font-bold font-display text-slate-900 dark:text-white flex items-center gap-1.5">
+                    {editingFactura ? 'Editar Comprobante' : 'Emisión de Factura Fiscal Oficial'}
+                    <span className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-bold rounded border border-emerald-500/20">
+                      ARCA WSFE
+                    </span>
                   </h3>
-                  <p className="text-[11px] text-slate-400">Comprobante fiscal o recibo con formato estándar</p>
+                  <p className="text-[11px] text-slate-400">Comprobante electrónico válido para reintegros y obras sociales</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg"
               >
                 <X size={18} />
+              </button>
+            </div>
+
+            {/* Selector de Modalidad */}
+            <div className="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl flex items-center gap-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => handleSelectModalidad('reintegro_paciente')}
+                className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
+                  modalidadEmision === 'reintegro_paciente'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                <User size={13} />
+                <span>Reintegro Paciente (O.S.)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSelectModalidad('directo_obra_social')}
+                className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
+                  modalidadEmision === 'directo_obra_social'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                <Building2 size={13} />
+                <span>Directa a Obra Social</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSelectModalidad('particular')}
+                className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
+                  modalidadEmision === 'particular'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                <span>Particular</span>
               </button>
             </div>
 
@@ -540,21 +740,21 @@ export const FacturasView = ({
                     onChange={(e) => setFormTipoComprobante(e.target.value)}
                     className="input-field text-xs"
                   >
-                    <option value="Factura C">Factura C (Monotributo)</option>
-                    <option value="Recibo de Honorarios">Recibo de Honorarios</option>
-                    <option value="Factura B">Factura B (Resp. Inscripto)</option>
+                    <option value="Factura C">Factura C (Monotributo - Cód 011)</option>
+                    <option value="Recibo de Honorarios">Recibo C (Honorarios - Cód 015)</option>
+                    <option value="Factura B">Factura B (Resp. Inscripto - Cód 006)</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Número
+                    Número de Comprobante
                   </label>
                   <input
                     type="text"
                     value={formNumeroFactura}
                     onChange={(e) => setFormNumeroFactura(e.target.value)}
-                    placeholder="0001-00000145"
+                    placeholder="0001-00000146"
                     className="input-field text-xs font-mono font-bold"
                     required
                   />
@@ -574,52 +774,146 @@ export const FacturasView = ({
                 </div>
               </div>
 
-              {/* Patient / Receptor */}
-              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5">
-                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <User size={12} /> Datos del Receptor / Paciente
+              {/* Cobertura de Obra Social y Nomenclador */}
+              <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 space-y-2.5">
+                <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Building2 size={13} /> Cobertura Médica & Código Nomenclador de Salud Mental
                 </span>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
-                      Seleccionar Paciente
+                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                      Obra Social / Prepaga
                     </label>
                     <select
-                      value={formPacienteId}
-                      onChange={(e) => handleSelectPaciente(e.target.value)}
-                      className="input-field text-xs"
+                      value={formObraSocialId}
+                      onChange={(e) => handleSelectObraSocialFiscal(e.target.value)}
+                      className="input-field text-xs font-bold"
                     >
-                      <option value="">-- Cargar manualmente --</option>
-                      {pacientes.map((p) => (
-                        <option key={p.id} value={p.id}>{p.nombreCompleto} (DNI: {p.dni || 'S/D'})</option>
+                      {OBRAS_SOCIALES_FISCALES.map(os => (
+                        <option key={os.id} value={os.id}>{os.sigla} ({os.tipo})</option>
                       ))}
+                      <option value="particular">Particular (Sin obra social)</option>
                     </select>
                   </div>
 
                   <div>
+                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                      N° Afiliado / Credencial
+                    </label>
+                    <input
+                      type="text"
+                      value={formNumeroAfiliado}
+                      onChange={(e) => setFormNumeroAfiliado(e.target.value)}
+                      placeholder="Ej: 14-89210-01"
+                      className="input-field text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                      Prestación Nomenclada
+                    </label>
+                    <select
+                      value={formNomencladorCodigo}
+                      onChange={(e) => setFormNomencladorCodigo(e.target.value)}
+                      className="input-field text-xs"
+                    >
+                      {NOMENCLADOR_SALUD_MENTAL.map(nom => (
+                        <option key={nom.codigo} value={nom.codigo}>
+                          {nom.codigo} - {nom.descripcion}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Período de servicio para ARCA */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 border-t border-emerald-200/50 dark:border-emerald-900/40">
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1">Servicio Desde (ARCA):</label>
+                    <input
+                      type="date"
+                      value={formFechaServicioDesde}
+                      onChange={(e) => setFormFechaServicioDesde(e.target.value)}
+                      className="input-field text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1">Servicio Hasta (ARCA):</label>
+                    <input
+                      type="date"
+                      value={formFechaServicioHasta}
+                      onChange={(e) => setFormFechaServicioHasta(e.target.value)}
+                      className="input-field text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1">Vencimiento para el Pago:</label>
+                    <input
+                      type="date"
+                      value={formFechaVencimientoPago}
+                      onChange={(e) => setFormFechaVencimientoPago(e.target.value)}
+                      className="input-field text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Receptor */}
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2.5">
+                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                  <User size={12} /> Datos del Receptor / Facturado a
+                </span>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                  {modalidadEmision !== 'directo_obra_social' && (
+                    <div>
+                      <label className="block text-[11px] text-slate-500 mb-1">
+                        Seleccionar Paciente
+                      </label>
+                      <select
+                        value={formPacienteId}
+                        onChange={(e) => handleSelectPaciente(e.target.value)}
+                        className="input-field text-xs"
+                      >
+                        <option value="">-- Cargar manualmente --</option>
+                        {pacientes.map((p) => (
+                          <option key={p.id} value={p.id}>{p.nombreCompleto} (DNI: {p.dni || 'S/D'})</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className={modalidadEmision === 'directo_obra_social' ? 'md:col-span-2' : ''}>
                     <label className="block text-[11px] text-slate-500 mb-1">
-                      Nombre y Apellido
+                      {modalidadEmision === 'directo_obra_social' ? 'Razón Social de la Obra Social' : 'Nombre y Apellido'}
                     </label>
                     <input
                       type="text"
                       value={formPacienteNombre}
                       onChange={(e) => setFormPacienteNombre(e.target.value)}
-                      placeholder="Nombre del paciente"
-                      className="input-field text-xs"
+                      className="input-field text-xs font-semibold"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
-                      DNI / CUIT
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] text-slate-500">
+                        {modalidadEmision === 'directo_obra_social' ? 'CUIT Entidad' : 'DNI / CUIT'}
+                      </label>
+                      {cuitVal && (
+                        <span className={`text-[9px] font-bold ${cuitVal.valido ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {cuitVal.valido ? '✓ CUIT Válido' : '⚠️ No es CUIT M11'}
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       value={formPacienteDni}
                       onChange={(e) => setFormPacienteDni(e.target.value)}
-                      placeholder="38.452.190"
+                      placeholder="38.452.190 o 30-54674125-3"
                       className="input-field text-xs font-mono"
                     />
                   </div>
@@ -636,8 +930,9 @@ export const FacturasView = ({
                       className="input-field text-xs"
                     >
                       <option value="Consumidor Final">Consumidor Final</option>
+                      <option value="IVA Exento">IVA Exento (Obras Sociales)</option>
+                      <option value="Responsable Inscripto">Responsable Inscripto</option>
                       <option value="Monotributo">Responsable Monotributo</option>
-                      <option value="Exento">IVA Exento</option>
                     </select>
                   </div>
 
@@ -676,7 +971,7 @@ export const FacturasView = ({
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                    Detalle de Conceptos / Sesiones
+                    Detalle de Prestaciones Psicológicas
                   </span>
                   <button
                     type="button"
@@ -684,7 +979,7 @@ export const FacturasView = ({
                     className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-semibold"
                   >
                     <Plus size={13} />
-                    <span>Agregar Ítem</span>
+                    <span>Agregar Sesión</span>
                   </button>
                 </div>
 
@@ -694,7 +989,7 @@ export const FacturasView = ({
                       <div className="flex-1">
                         <input
                           type="text"
-                          placeholder="Descripción del concepto"
+                          placeholder="Descripción de la prestación"
                           value={item.descripcion}
                           onChange={(e) => handleItemChange(idx, 'descripcion', e.target.value)}
                           className="input-field text-xs"
@@ -743,7 +1038,7 @@ export const FacturasView = ({
                 {/* Subtotal */}
                 <div className="flex justify-end pt-1">
                   <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-right min-w-[200px]">
-                    <span className="text-[11px] text-slate-500">Total a Facturar:</span>
+                    <span className="text-[11px] text-slate-500">Total Comprobante:</span>
                     <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                       ${calculateSubtotal().toLocaleString('es-AR')}
                     </div>
@@ -751,51 +1046,55 @@ export const FacturasView = ({
                 </div>
               </div>
 
-              {/* Fiscal CAE / Observaciones */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">
-                    CAE Electrónico (AFIP)
-                  </label>
-                  <input
-                    type="text"
-                    value={formCae}
-                    onChange={(e) => setFormCae(e.target.value)}
-                    placeholder="74392019482910"
-                    className="input-field text-xs font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">
-                    Vencimiento CAE
-                  </label>
-                  <input
-                    type="date"
-                    value={formVencimientoCae}
-                    onChange={(e) => setFormVencimientoCae(e.target.value)}
-                    className="input-field text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">
-                    Estado Inicial
-                  </label>
-                  <select
-                    value={formEstado}
-                    onChange={(e) => setFormEstado(e.target.value)}
-                    className="input-field text-xs font-semibold"
+              {/* Fiscal CAE / ARCA */}
+              <div className="p-3 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-teal-950/40 rounded-2xl border border-emerald-500/30 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <QrCode size={13} /> Autorización Electrónica ARCA (WSFE v1)
+                  </span>
+                  
+                  <button
+                    type="button"
+                    onClick={handleAuthorizeArca}
+                    disabled={isAuthorizingArca}
+                    className="px-3 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1"
                   >
-                    <option value="Cobrada">Cobrada</option>
-                    <option value="Pendiente">Pendiente</option>
-                  </select>
+                    <RefreshCw size={12} className={isAuthorizingArca ? 'animate-spin' : ''} />
+                    <span>{isAuthorizingArca ? 'Autorizando en ARCA...' : 'Solicitar CAE a ARCA'}</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">
+                      Código CAE Obtenido
+                    </label>
+                    <input
+                      type="text"
+                      value={formCae}
+                      onChange={(e) => setFormCae(e.target.value)}
+                      placeholder="75392019482910"
+                      className="input-field text-xs font-mono font-bold bg-slate-950 text-emerald-400 border-emerald-900/60"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">
+                      Vencimiento CAE
+                    </label>
+                    <input
+                      type="date"
+                      value={formVencimientoCae}
+                      onChange={(e) => setFormVencimientoCae(e.target.value)}
+                      className="input-field text-xs bg-slate-950 text-slate-200 border-emerald-900/60"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div>
                 <label className="block text-[11px] text-slate-500 mb-1">
-                  Observaciones / Leyenda para Reintegro
+                  Observaciones / Leyenda para Auditoría de Reintegro
                 </label>
                 <input
                   type="text"
@@ -817,10 +1116,10 @@ export const FacturasView = ({
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary text-xs"
+                  className="btn btn-primary text-xs py-2 px-4 font-bold flex items-center gap-1.5"
                 >
                   <Check size={14} />
-                  <span>Guardar Comprobante</span>
+                  <span>Guardar y Emitir Comprobante</span>
                 </button>
               </div>
 

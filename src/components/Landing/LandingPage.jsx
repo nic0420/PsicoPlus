@@ -29,7 +29,8 @@ export const LandingPage = ({
   onStartFree, 
   onLogin, 
   onOpenDemo, 
-  onGoToPortal 
+  onGoToPortal,
+  onOpenLegal 
 }) => {
   const [activeTabFeature, setActiveTabFeature] = useState('agenda');
   const [openFaq, setOpenFaq] = useState(null);
@@ -747,17 +748,123 @@ export const LandingPage = ({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-emerald-950 bg-[#060c09] py-10 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
-              <HeartPulse size={14} />
+      {/* Footer Legal & Seguridad */}
+      <footer className="border-t border-emerald-950/80 bg-[#060c09] pt-12 pb-10 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-emerald-950/60 text-left">
+            {/* Columna 1: Marca & Misión */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black">
+                  <HeartPulse size={16} />
+                </div>
+                <span className="font-extrabold text-base text-white font-display">PsicoPlus</span>
+                <span className="text-[9px] font-bold bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">APP</span>
+              </div>
+              <p className="text-[11px] text-emerald-100/60 leading-relaxed">
+                Plataforma integral de gestión clínica, agenda multisede y facturación electrónica ARCA para profesionales de la salud mental.
+              </p>
+              <div className="flex items-center gap-2 text-[10px] text-emerald-400 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Servicio 100% Operativo y Seguro</span>
+              </div>
             </div>
-            <span className="font-bold text-slate-300 font-display">PsicoPlus</span>
-            <span>— Software Clínico para Psicólogos</span>
+
+            {/* Columna 2: Funcionalidades */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Funcionalidades</h4>
+              <ul className="space-y-1.5 text-[11px]">
+                <li><a href="#caracteristicas" className="hover:text-emerald-400 transition-colors">Agenda Inteligente</a></li>
+                <li><a href="#obras-sociales" className="hover:text-emerald-400 transition-colors">Obras Sociales & Prepagas</a></li>
+                <li><a href="#precios" className="hover:text-emerald-400 transition-colors">Facturación Electrónica ARCA</a></li>
+                <li><a href="#portal" onClick={onGoToPortal} className="hover:text-emerald-400 transition-colors">Portal de Pacientes</a></li>
+              </ul>
+            </div>
+
+            {/* Columna 3: Centro Legal & Normativas */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Marco Legal & Seguridad</h4>
+              <ul className="space-y-1.5 text-[11px]">
+                <li>
+                  <button 
+                    onClick={() => onOpenLegal && onOpenLegal('terminos')} 
+                    className="hover:text-emerald-400 transition-colors text-left"
+                  >
+                    Términos y Condiciones
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onOpenLegal && onOpenLegal('privacidad')} 
+                    className="hover:text-emerald-400 transition-colors text-left"
+                  >
+                    Política de Privacidad (Ley 25.326)
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onOpenLegal && onOpenLegal('cookies')} 
+                    className="hover:text-emerald-400 transition-colors text-left"
+                  >
+                    Política de Cookies & Storage
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onOpenLegal && onOpenLegal('salud-mental')} 
+                    className="hover:text-emerald-400 transition-colors text-left"
+                  >
+                    Leyes de Salud Mental & ARCA
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onOpenLegal && onOpenLegal('auditoria')} 
+                    className="hover:text-emerald-400 transition-colors text-left font-bold text-emerald-400/90"
+                  >
+                    Auditoría de Seguridad en Vivo
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 4: Sellos de Cumplimiento */}
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Garantías de Seguridad</h4>
+              <div className="p-2.5 rounded-xl bg-slate-950/70 border border-emerald-950 text-[10px] space-y-1.5">
+                <div className="flex items-center gap-1.5 text-emerald-300 font-bold">
+                  <ShieldCheck size={13} />
+                  <span>Ley 25.326 • Datos Sensibles</span>
+                </div>
+                <p className="text-slate-400 text-[10px]">
+                  Historias clínicas amparadas por secreto profesional (Cód. Penal Art. 156).
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-slate-950/70 border border-emerald-950 text-[10px] space-y-1.5">
+                <div className="flex items-center gap-1.5 text-teal-300 font-bold">
+                  <Receipt size={13} />
+                  <span>ARCA RG 4291 • Factura Electrónica</span>
+                </div>
+                <p className="text-slate-400 text-[10px]">
+                  Comprobantes fiscales con código QR y CAE homologado.
+                </p>
+              </div>
+            </div>
           </div>
-          <p>© {new Date().getFullYear()} PsicoPlus. Todos los derechos reservados.</p>
+
+          {/* Subfooter */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 pt-2">
+            <p>© {new Date().getFullYear()} PsicoPlus. Sistema de Gestión Clínica para Psicólogos. Todos los derechos reservados.</p>
+            <div className="flex items-center gap-4">
+              <button onClick={() => onOpenLegal && onOpenLegal('terminos')} className="hover:underline">Términos</button>
+              <button onClick={() => onOpenLegal && onOpenLegal('privacidad')} className="hover:underline">Privacidad</button>
+              <button onClick={() => onOpenLegal && onOpenLegal('cookies')} className="hover:underline">Cookies</button>
+              <button onClick={() => onOpenLegal && onOpenLegal('auditoria')} className="hover:underline text-emerald-400">Auditoría A+</button>
+            </div>
+          </div>
+
         </div>
       </footer>
 

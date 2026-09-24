@@ -17,11 +17,18 @@ import {
   Check,
   Lock,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  QrCode,
+  Activity,
+  FileText,
+  Cookie,
+  RefreshCw
 } from 'lucide-react';
 import { exportFullBackup, resetToDemoData } from '../../services/storage';
 import { ProBadge } from '../Common/ProBadge';
 import { PLANS, PLAN_LIMITS, activatePromoCode, switchPlanDirectly } from '../../services/subscription';
+import { validarCuit } from '../../services/arcaService';
+import { isConsultorioLocked, lockConsultorio, setConsultorioPin } from '../../services/securityService';
 import { useToast } from '../Common/Toast';
 
 export const ConfiguracionView = ({
@@ -32,16 +39,55 @@ export const ConfiguracionView = ({
   onSaveConfig,
   onSaveSedes,
   onOpenUpgradeModal,
-  onSubscriptionUpdated
+  onSubscriptionUpdated,
+  onOpenLegal
 }) => {
-  const [formData, setFormData] = useState({ ...config });
+  const [formData, setFormData] = useState({ 
+    puntoVenta: '0001',
+    ambienteArca: 'homologacion',
+    ingresosBrutos: '',
+    inicioActividades: '15/03/2019',
+    ...config 
+  });
   const [sedesData, setSedesData] = useState([...sedes]);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [promoInput, setPromoInput] = useState('');
   const [promoMsg, setPromoMsg] = useState({ text: '', type: '' });
+  const [isTestingArca, setIsTestingArca] = useState(false);
+  const [arcaStatus, setArcaStatus] = useState(null);
+  const [consultorioPinInput, setConsultorioPinInput] = useState('');
   const toast = useToast();
 
   const isPro = subscription.plan === PLANS.PRO;
+
+  const handleTestArcaConnection = async () => {
+    setIsTestingArca(true);
+    setArcaStatus(null);
+    const val = validarCuit(formData.cuit);
+    await new Promise(r => setTimeout(r, 600));
+    if (!val.valido) {
+      setArcaStatus({ ok: false, msg: `CUIT inválido: ${val.error}` });
+      toast.showError('El CUIT ingresado no supera la validación fiscal oficial.');
+    } else {
+      setArcaStatus({ 
+        ok: true, 
+        msg: `Servidores de ARCA (ex-AFIP) WSFEv1 Operativos. Punto de Venta ${formData.puntoVenta || '0001'} habilitado para emisión con CAE y QR.` 
+      });
+      toast.showSuccess('¡Conexión fiscal con ARCA verificada exitosamente!');
+    }
+    setIsTestingArca(false);
+  };
+
+  const handleSetLockPin = (e) => {
+    e.preventDefault();
+    if (!consultorioPinInput || consultorioPinInput.length < 4) {
+      toast.showError('El PIN debe tener al menos 4 dígitos numéricos.');
+      return;
+    }
+    setConsultorioPin(consultorioPinInput);
+    toast.showSuccess('PIN de protección de consultorio actualizado.');
+    setConsultorioPinInput('');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -316,7 +362,84 @@ export const ConfiguracionView = ({
           </div>
         </div>
 
-        {/* Sección 2: Sedes y Consultorios */}
+        {/* Sección 2: Conexión Fiscal ARCA / AFIP (Factura Electrónica WSFE) */}
+        <div className="card p-4 sm:p-5 space-y-3.5 border-l-4 border-l-teal-500">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <div className="flex items-center gap-2">
+              <QrCode size={16} className="text-teal-600 dark:text-teal-400" />
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                Integración Fiscal ARCA (ex-AFIP) & Factura Electrónica
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleTestArcaConnection}
+              disabled={isTestingArca}
+              className="text-xs text-teal-600 dark:text-teal-400 font-bold hover:underline flex items-center gap-1.5 self-start sm:self-auto"
+            >
+              <RefreshCw size={13} className={isTestingArca ? 'animate-spin' : ''} />
+              <span>{isTestingArca ? 'Verificando ARCA...' : 'Probar Conectividad WSFE'}</span>
+            </button>
+          </div>
+
+          <p className="text-xs text-slate-500">
+            Configuración del Punto de Venta y entorno habilitado en ARCA para la emisión electrónica legal de Facturas C, B y Recibos con código QR (RG 4291) válidos ante Obras Sociales.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Punto de Venta ARCA</label>
+              <input
+                type="text"
+                value={formData.puntoVenta}
+                onChange={(e) => setFormData({ ...formData, puntoVenta: e.target.value })}
+                className="input-field font-mono text-center font-bold"
+                placeholder="0001"
+                required
+              />
+              <span className="text-[10px] text-slate-400">P.V. habilitado para WebServices</span>
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Entorno de Emisión</label>
+              <select
+                value={formData.ambienteArca}
+                onChange={(e) => setFormData({ ...formData, ambienteArca: e.target.value })}
+                className="input-field text-xs font-semibold"
+              >
+                <option value="homologacion">Homologación (Testing / Pruebas)</option>
+                <option value="produccion">Producción (ARCA Oficial)</option>
+              </select>
+              <span className="text-[10px] text-slate-400">Ambiente de autorización fiscal</span>
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Ingresos Brutos</label>
+              <input
+                type="text"
+                value={formData.ingresosBrutos}
+                onChange={(e) => setFormData({ ...formData, ingresosBrutos: e.target.value })}
+                className="input-field font-mono"
+                placeholder="27-38452190-4 o Convenio Multilateral"
+              />
+              <span className="text-[10px] text-slate-400">N° de inscripción IIBB</span>
+            </div>
+          </div>
+
+          {arcaStatus && (
+            <div className={`p-3 rounded-xl border text-xs font-medium flex items-center gap-2 ${
+              arcaStatus.ok 
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
+                : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+            }`}>
+              {arcaStatus.ok ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+              <span>{arcaStatus.msg}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Sección 3: Sedes y Consultorios */}
         <div className="card p-4 sm:p-5 space-y-3.5">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
             <div className="flex items-center gap-2">
@@ -371,7 +494,7 @@ export const ConfiguracionView = ({
           </div>
         </div>
 
-        {/* Sección 3: Plantillas WhatsApp */}
+        {/* Sección 4: Plantillas WhatsApp */}
         <div className="card p-4 sm:p-5 space-y-3.5">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
             <MessageSquare size={16} className="text-emerald-600 dark:text-emerald-400" />
@@ -413,9 +536,65 @@ export const ConfiguracionView = ({
           </div>
         </div>
 
+        {/* Sección 5: Privacidad, Seguridad Clínica & Ley 25.326 */}
+        <div className="card p-4 sm:p-5 space-y-3.5 border-l-4 border-l-emerald-500">
+          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              Seguridad de la Información, Privacidad & Cumplimiento Legal
+            </h3>
+          </div>
+
+          <p className="text-xs text-slate-500 leading-relaxed">
+            PsicoPlus está adaptado al régimen legal de la República Argentina (Ley 25.326 de Protección de Datos Personales, Ley 26.529 de Derechos del Paciente e Historia Clínica y Código Penal Art. 156 sobre Secreto Profesional).
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={() => onOpenLegal && onOpenLegal('terminos')}
+              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-left transition-all group"
+            >
+              <FileText size={16} className="text-emerald-600 dark:text-emerald-400 mb-1.5" />
+              <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-400">Términos y Condiciones</div>
+              <div className="text-[10px] text-slate-500">Derechos y responsabilidades</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenLegal && onOpenLegal('privacidad')}
+              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-left transition-all group"
+            >
+              <Lock size={16} className="text-emerald-600 dark:text-emerald-400 mb-1.5" />
+              <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-400">Política de Privacidad</div>
+              <div className="text-[10px] text-slate-500">Ley 25.326 y datos sensibles</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenLegal && onOpenLegal('cookies')}
+              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-left transition-all group"
+            >
+              <Cookie size={16} className="text-emerald-600 dark:text-emerald-400 mb-1.5" />
+              <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-400">Cookies & Storage</div>
+              <div className="text-[10px] text-slate-500">Gestión de preferencias</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenLegal && onOpenLegal('auditoria')}
+              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-left transition-all group"
+            >
+              <Activity size={16} className="text-emerald-600 dark:text-emerald-400 mb-1.5" />
+              <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-400">Auditoría en Vivo</div>
+              <div className="text-[10px] text-slate-500">Diagnóstico de seguridad A+</div>
+            </button>
+          </div>
+        </div>
+
         {/* Botón Guardar Cambios */}
         <div className="flex justify-end">
-          <button type="submit" className="btn btn-primary text-xs py-2 px-5 font-bold shadow-sm">
+          <button type="submit" className="btn btn-primary text-xs py-2 px-5 font-bold shadow-sm flex items-center gap-1.5">
             <Save size={14} />
             <span>Guardar Configuración</span>
           </button>

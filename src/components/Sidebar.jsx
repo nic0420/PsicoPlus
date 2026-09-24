@@ -14,7 +14,8 @@ import {
   Sparkles,
   Zap,
   LogOut,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck
 } from 'lucide-react';
 import { ProBadge } from './Common/ProBadge';
 import { PLANS, PLAN_LIMITS } from '../services/subscription';
@@ -30,7 +31,8 @@ export const Sidebar = ({
   onCloseMobile,
   onOpenUpgradeModal,
   onOpenLanding,
-  onLogout
+  onLogout,
+  onOpenLegal
 }) => {
   const isPro = subscription.plan === PLANS.PRO;
   const maxFreePatients = PLAN_LIMITS[PLANS.FREE].maxPacientes;
@@ -161,6 +163,22 @@ export const Sidebar = ({
           >
             <span>Ver Landing Page Pública</span>
             <ExternalLink size={12} />
+          </button>
+        )}
+
+        {/* Legal & Security Center button */}
+        {onOpenLegal && (
+          <button
+            onClick={() => onOpenLegal('auditoria')}
+            className="w-full px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-emerald-950/60 border border-emerald-900/50 text-[11px] font-semibold text-emerald-300 flex items-center justify-between transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={13} className="text-emerald-400" />
+              <span>Seguridad & Ley 25.326</span>
+            </span>
+            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded border border-emerald-500/30">
+              A+
+            </span>
           </button>
         )}
 
