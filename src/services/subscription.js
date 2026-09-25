@@ -46,7 +46,7 @@ export const PAYMENT_INFO = {
   alias: 'nico.adolfo.mp',
   cvu: '0000003100004965726450',
   // WhatsApp donde se reciben los comprobantes (formato internacional, sin +). CONFIRMAR NÚMERO.
-  whatsapp: '5493794889922',
+  whatsapp: '5493794021813',
 };
 
 export const formatARS = (n) => `$${Number(n || 0).toLocaleString('es-AR')}`;
