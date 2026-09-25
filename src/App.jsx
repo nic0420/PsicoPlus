@@ -20,6 +20,7 @@ import { UpgradeModal } from './components/Common/UpgradeModal';
 import { AuthModal } from './components/Auth/AuthModal';
 import { LandingPage } from './components/Landing/LandingPage';
 import { LegalModal } from './components/Legal/LegalModal';
+import { BrandMark, BrandWordmark } from './components/Common/BrandMark';
 import { CookieConsentBanner } from './components/Common/CookieConsentBanner';
 import { supabase } from './lib/supabase';
 import './App.css';
@@ -297,18 +298,18 @@ export function AppContent() {
   // Render 1: Standalone Patient Portal Mode
   if (viewMode === 'portal-standalone') {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#080c14] p-3 sm:p-6 md:p-8 flex flex-col justify-between">
+      <div className="min-h-screen bg-transparent text-[var(--text-main)] p-3 sm:p-6 md:p-8 flex flex-col justify-between">
         <div className="w-full max-w-3xl mx-auto flex items-center justify-between mb-4">
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Portal Pacientes • PsicoPlus</span>
+          <span className="flex items-center gap-2"><BrandMark size={28} /><BrandWordmark className="text-[var(--text-main)]" /><span className="text-[12.5px] text-slate-500 ml-1 hidden sm:inline">Portal de pacientes</span></span>
           <button
             onClick={() => {
               window.history.pushState({}, '', window.location.pathname);
               setViewMode('app');
               setActiveTab('dashboard');
             }}
-            className="text-xs text-slate-500 hover:text-emerald-600 font-medium"
+            className="h-9 px-3 rounded-lg text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-900/5 font-medium"
           >
-            Acceso Profesional →
+            Acceso profesional →
           </button>
         </div>
         <PortalTurnosView
@@ -319,7 +320,7 @@ export function AppContent() {
           onSaveTurno={handleSaveTurno}
           isStandalone={true}
         />
-        <footer className="text-center text-[11px] text-slate-400 mt-8 pb-6">
+        <footer className="text-center text-[12px] text-slate-400 mt-8 pb-6">
           © {new Date().getFullYear()} PsicoPlus - Sistema de Gestión Profesional
         </footer>
       </div>
@@ -368,7 +369,7 @@ export function AppContent() {
 
   // Render 3: Main Professional App View
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-[#080c14] text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen flex bg-transparent text-[var(--text-main)] transition-colors">
       
       {/* Sidebar Navigation */}
       <Sidebar 
@@ -393,6 +394,8 @@ export function AppContent() {
       <div className="flex-1 flex flex-col min-w-0">
         
         <Header 
+          activeTab={activeTab}
+          onNavigateTab={setActiveTab}
           sedes={sedes}
           selectedSedeId={selectedSedeId}
           onSelectSede={setSelectedSedeId}

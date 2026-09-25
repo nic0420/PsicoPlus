@@ -51,12 +51,13 @@ export const createReminderMessage = (template, { pacienteNombre, dia, hora, sed
   return text;
 };
 
-export const createOrderAlertMessage = (template, { pacienteNombre, obraSocialNombre, sesionesRestantes }) => {
+export const createOrderAlertMessage = (template, { pacienteNombre, obraSocialNombre, sesionesRestantes, sesionesDisponibles } = {}) => {
   let text = template || '¡Hola {nombre}! Te comento que te quedan {restantes} sesiones de tu orden médica de {obra_social}. Te sugiero solicitar un nuevo pedido a tu médico. ¡Gracias!';
+  const count = sesionesRestantes !== undefined ? sesionesRestantes : sesionesDisponibles !== undefined ? sesionesDisponibles : 0;
   
   text = text.replace('{nombre}', pacienteNombre || 'estimado/a');
   text = text.replace('{obra_social}', obraSocialNombre || 'tu obra social');
-  text = text.replace('{restantes}', sesionesRestantes.toString());
+  text = text.replace('{restantes}', count.toString());
 
   return text;
 };

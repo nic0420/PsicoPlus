@@ -89,7 +89,7 @@ export const CommandPalette = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="card max-w-xl w-full p-0 overflow-hidden shadow-2xl animate-fade-in border border-emerald-200 dark:border-emerald-800"
+        className="card max-w-xl w-full p-0 overflow-hidden shadow-[var(--shadow-pop)] animate-fade-in border border-emerald-200 dark:border-emerald-800"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
@@ -103,7 +103,7 @@ export const CommandPalette = ({
             onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-transparent text-sm text-slate-900 dark:text-white outline-none font-medium placeholder:text-slate-400"
           />
-          <kbd className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
+          <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
             ESC
           </kbd>
         </div>
@@ -114,7 +114,7 @@ export const CommandPalette = ({
           {/* Pacientes Matches */}
           {filteredPacientes.length > 0 && (
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2.5 py-1 block">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 py-1 block">
                 Pacientes
               </span>
               <div className="space-y-0.5">
@@ -129,14 +129,14 @@ export const CommandPalette = ({
                     className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left hover:bg-emerald-50 dark:hover:bg-slate-800/80 transition-colors group"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center">
                         {pac.nombreCompleto.substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <span className="font-bold text-slate-900 dark:text-white block">
+                        <span className="font-semibold text-slate-900 dark:text-white block">
                           {pac.nombreCompleto}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-[11px] text-slate-400 font-mono">
                           DNI: {pac.dni || 'S/D'} • {pac.obraSocialId.toUpperCase()}
                         </span>
                       </div>
@@ -151,7 +151,7 @@ export const CommandPalette = ({
           {/* Actions Matches */}
           {filteredActions.length > 0 && (
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2.5 py-1 block">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 py-1 block">
                 Comandos & Navegación
               </span>
               <div className="space-y-0.5">
@@ -171,7 +171,7 @@ export const CommandPalette = ({
                           {act.label}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400">{act.category}</span>
+                      <span className="text-[11px] text-slate-400">{act.category}</span>
                     </button>
                   );
                 })}
@@ -188,7 +188,7 @@ export const CommandPalette = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-2.5 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 px-4">
+        <div className="p-2.5 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px] text-slate-400 px-4">
           <span>Presiona <kbd className="font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">↵</kbd> para seleccionar</span>
           <span>PsicoPlus Command Palette</span>
         </div>

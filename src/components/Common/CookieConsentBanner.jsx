@@ -40,57 +40,46 @@ export const CookieConsentBanner = ({ onOpenLegal }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-3 sm:bottom-4 left-3 sm:left-6 right-3 sm:right-auto sm:max-w-md z-40 animate-fade-in">
-      <div className="p-4 sm:p-4.5 rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 text-white shadow-2xl shadow-slate-950/50 space-y-3">
-        
+    <div role="dialog" aria-label="Preferencias de privacidad" className="fixed bottom-3 sm:bottom-5 left-3 sm:left-5 right-3 sm:right-auto sm:max-w-[380px] z-40 animate-fade-in">
+      <div className="p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-main)] shadow-[var(--shadow-pop)]">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 flex-shrink-0 mt-0.5">
-            <Cookie size={18} />
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 grid place-items-center flex-shrink-0">
+            <Cookie size={16} />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold font-display text-white flex items-center gap-1.5">
-                Privacidad & Almacenamiento Seguro
-              </h4>
-              <button 
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h4 className="text-[14px] font-semibold leading-snug">Tu privacidad, primero</h4>
+              <button
                 onClick={handleAcceptEssential}
-                className="text-slate-400 hover:text-white p-0.5"
+                className="-mt-1 -mr-1 w-7 h-7 grid place-items-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-900/5 dark:hover:text-slate-200"
                 title="Cerrar y aceptar solo esenciales"
+                aria-label="Cerrar"
               >
                 <X size={15} />
               </button>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-              PsicoPlus almacena información clínica localmente respetando la <strong>Ley N° 25.326</strong>. No usamos cookies de rastreo publicitario invasivas.
+            <p className="text-[12.5px] text-[var(--text-muted)] mt-1 leading-relaxed">
+              Guardamos la información clínica respetando la <strong className="font-medium text-[var(--text-main)]">Ley 25.326</strong>. Sin cookies publicitarias.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <button
-            onClick={handleAcceptAll}
-            className="flex-1 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1"
-          >
-            <Check size={13} />
-            <span>Aceptar Todas</span>
+        <div className="flex items-center gap-2 mt-3.5">
+          <button onClick={handleAcceptAll} className="btn btn-primary flex-1 !min-h-9 !text-[13px]">
+            <Check size={14} /> Aceptar
           </button>
-
-          <button
-            onClick={handleAcceptEssential}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all"
-          >
-            Solo Esenciales
+          <button onClick={handleAcceptEssential} className="btn btn-secondary !min-h-9 !text-[13px]">
+            Solo esenciales
           </button>
-
           <button
             onClick={handleOpenConfig}
-            className="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors"
+            className="w-9 h-9 grid place-items-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-900/5 dark:hover:text-slate-200"
             title="Personalizar opciones de cookies"
+            aria-label="Personalizar cookies"
           >
             <Settings size={15} />
           </button>
         </div>
-
       </div>
     </div>
   );

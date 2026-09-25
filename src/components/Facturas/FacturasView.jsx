@@ -57,11 +57,11 @@ export const FacturasView = ({
   const [formNumeroAfiliado, setFormNumeroAfiliado] = useState('');
   const [formTipoComprobante, setFormTipoComprobante] = useState('Factura C');
   const [formNumeroFactura, setFormNumeroFactura] = useState('');
-  const [formFechaEmision, setFormFechaEmision] = useState(new Date().toISOString().split('T')[0]);
+  const [formFechaEmision, setFormFechaEmision] = useState(() => new Date().toISOString().split('T')[0]);
   const [formPeriodo, setFormPeriodo] = useState('Septiembre 2026');
-  const [formFechaServicioDesde, setFormFechaServicioDesde] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
-  const [formFechaServicioHasta, setFormFechaServicioHasta] = useState(new Date().toISOString().split('T')[0]);
-  const [formFechaVencimientoPago, setFormFechaVencimientoPago] = useState(new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]);
+  const [formFechaServicioDesde, setFormFechaServicioDesde] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+  const [formFechaServicioHasta, setFormFechaServicioHasta] = useState(() => new Date().toISOString().split('T')[0]);
+  const [formFechaVencimientoPago, setFormFechaVencimientoPago] = useState(() => new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]);
   const [formCondicionVenta, setFormCondicionVenta] = useState('Transferencia Bancaria');
   const [formCondicionIvaReceptor, setFormCondicionIvaReceptor] = useState('Consumidor Final');
   const [formEstado, setFormEstado] = useState('Cobrada');
@@ -343,11 +343,20 @@ export const FacturasView = ({
   };
 
   const handleDownloadPDF = async (factura) => {
-    const paciente = pacientes.find(p => p.id === factura.pacienteId);
-    const obraSocial = OBRAS_SOCIALES_FISCALES.find(os => os.id === factura.obraSocialId || os.sigla === factura.obraSocialNombre);
-    toast.showInfo('Generando PDF oficial con Código QR fiscal de ARCA...');
-    await generateFacturaPDF({ factura, config, paciente, obraSocial });
-    toast.showSuccess('Factura PDF descargada con QR y CAE oficial.');
+    try {
+      const paciente = pacientes.find(p => p.id === factura.pacienteId) || {
+        nombreCompleto: factura.pacienteNombre,
+        dni: factura.pacienteDni,
+        direccion: factura.pacienteDomicilio
+      };
+      const obraSocial = OBRAS_SOCIALES_FISCALES.find(os => os.id === factura.obraSocialId || os.sigla === factura.obraSocialNombre);
+      toast.showInfo('Generando PDF oficial con Código QR fiscal de ARCA...');
+      await generateFacturaPDF({ factura, config, paciente, obraSocial });
+      toast.showSuccess('Factura PDF descargada con QR y CAE oficial.');
+    } catch (err) {
+      console.error('Error al generar PDF de la factura:', err);
+      toast.showError('No se pudo generar la factura: ' + (err.message || 'Error desconocido'));
+    }
   };
 
   const handleSendWhatsapp = (factura) => {
@@ -373,90 +382,91 @@ export const FacturasView = ({
     <div className="space-y-5 animate-fade-in">
       
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-800">
-        <div>
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-              <ShieldCheck size={12} /> Facturación Oficial ARCA & Obras Sociales
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-emerald-900 text-white p-6 sm:p-7 rounded-3xl shadow-[var(--shadow-hover)] border border-emerald-500/30 relative overflow-hidden backdrop-blur-md">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1.5 shadow-xs">
+              <ShieldCheck size={12} className="text-emerald-400" /> Facturación Oficial ARCA & O.S.
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1">
-              <QrCode size={11} /> RG 4291 con QR
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-400/30 flex items-center gap-1.5 shadow-xs">
+              <QrCode size={11} className="text-teal-300" /> RG 4291 con QR
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display">Facturación Fiscal Electrónica</h2>
-          <p className="text-slate-300 text-xs mt-0.5">
+          <h2 className="font-serif text-[2.1rem] sm:text-[2.6rem] leading-[1.04] text-white">Facturación fiscal electrónica</h2>
+          <p className="text-emerald-100/75 text-xs mt-1 max-w-2xl leading-relaxed">
             Generá Facturas C, B y Recibos con Código QR oficial de ARCA para reintegros de OSDE, Swiss Medical, IOSCOR, Medifé y más.
           </p>
         </div>
 
         <button
           onClick={() => handleOpenNuevo()}
-          className="btn btn-primary text-xs py-2 px-4 shadow-sm self-start md:self-auto font-bold flex items-center gap-1.5"
+          className="btn btn-primary text-xs py-2.5 px-5 shadow-sm self-start md:self-auto font-semibold flex items-center gap-2 relative z-10 active:scale-95"
         >
-          <Plus size={15} />
+          <Plus size={16} />
           <span>Emitir Factura / Recibo</span>
         </button>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="card p-4.5 card-glow-purple">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="glass-card p-5 rounded-2xl relative overflow-hidden group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Facturado</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+            <span className="text-[12px] font-semibold text-slate-500 dark:text-emerald-300/70 uppercase tracking-wider">Total Facturado</span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
               <DollarSign size={18} />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
+          <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-2 tabular-nums tracking-tight">
             ${totalFacturado.toLocaleString('es-AR')}
           </h3>
-          <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+          <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium mt-1">
             {facturas.length} comprobantes emitidos
           </p>
         </div>
 
-        <div className="card p-4.5 card-glow-emerald">
+        <div className="glass-card p-5 rounded-2xl relative overflow-hidden group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Cobrado</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+            <span className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Cobrado</span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
               <CheckCircle2 size={18} />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold font-display text-emerald-700 dark:text-emerald-400 mt-1">
+          <h3 className="text-2xl sm:text-3xl font-semibold font-display text-emerald-700 dark:text-emerald-400 mt-2 tabular-nums tracking-tight">
             ${totalCobrado.toLocaleString('es-AR')}
           </h3>
-          <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
+          <p className="text-[12px] text-emerald-600/80 dark:text-emerald-400/80 font-medium mt-1">
             Acreditado o recibido
           </p>
         </div>
 
-        <div className="card p-4.5 card-glow-amber">
+        <div className="glass-card p-5 rounded-2xl relative overflow-hidden group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Pendiente</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900">
+            <span className="text-[12px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Pendiente</span>
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-105 transition-transform">
               <Clock size={18} />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold font-display text-amber-700 dark:text-amber-400 mt-1">
+          <h3 className="text-2xl sm:text-3xl font-semibold font-display text-amber-700 dark:text-amber-400 mt-2 tabular-nums tracking-tight">
             ${totalPendiente.toLocaleString('es-AR')}
           </h3>
-          <p className="text-[11px] text-amber-600 font-medium mt-0.5">
+          <p className="text-[12px] text-amber-600/80 dark:text-amber-400/80 font-medium mt-1">
             Por liquidar / cobrar
           </p>
         </div>
 
-        <div className="card p-4.5">
+        <div className="glass-card p-5 rounded-2xl relative overflow-hidden group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Con CAE ARCA</span>
-            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-100 dark:border-teal-900">
+            <span className="text-[12px] font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">ARCA Oficial</span>
+            <div className="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-105 transition-transform">
               <FileCheck size={18} />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
-            {totalConCae} de {facturas.length}
+          <h3 className="text-2xl sm:text-3xl font-semibold font-display text-teal-700 dark:text-teal-400 mt-2 tabular-nums tracking-tight">
+            {totalConCae} con CAE
           </h3>
-          <p className="text-[11px] text-teal-600 font-medium mt-0.5">
-            Autorizados con QR fiscal
+          <p className="text-[12px] text-teal-600/80 dark:text-teal-400/80 font-medium mt-1">
+            Comprobantes con QR válido
           </p>
         </div>
       </div>
@@ -514,7 +524,7 @@ export const FacturasView = ({
       <div className="card p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="px-4 py-3">Comprobante Fiscal</th>
                 <th className="px-4 py-3">Fecha & Período</th>
@@ -544,17 +554,17 @@ export const FacturasView = ({
                       {/* Comprobante */}
                       <td className="px-4 py-3 font-mono">
                         <div className="flex items-center gap-1.5">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
                             isFacturaC 
                               ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
                               : 'bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
                           }`}>
                             {factura.tipoComprobante}
                           </span>
-                          <span className="font-bold text-slate-800 dark:text-slate-200">{factura.numeroFactura}</span>
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">{factura.numeroFactura}</span>
                         </div>
                         {factura.cae && (
-                          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-sans flex items-center gap-1">
+                          <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-sans flex items-center gap-1">
                             <CheckCircle2 size={10} />
                             <span>CAE: {factura.cae}</span>
                           </div>
@@ -564,19 +574,19 @@ export const FacturasView = ({
                       {/* Fecha */}
                       <td className="px-4 py-3">
                         <div className="font-semibold text-slate-800 dark:text-slate-200">{factura.fechaEmision}</div>
-                        <div className="text-[10px] text-slate-400">{factura.periodoFacturado || 'Mes en curso'}</div>
+                        <div className="text-[11px] text-slate-400">{factura.periodoFacturado || 'Mes en curso'}</div>
                       </td>
 
                       {/* Paciente y Obra Social */}
                       <td className="px-4 py-3">
-                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                        <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                           <User size={12} className="text-slate-400" />
                           {factura.pacienteNombre}
                         </div>
-                        <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
                           <span>DNI: {factura.pacienteDni || 'S/D'}</span>
                           {factura.obraSocialNombre && (
-                            <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-bold text-[9px]">
+                            <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-semibold text-[10.5px]">
                               {factura.obraSocialNombre}
                             </span>
                           )}
@@ -588,7 +598,7 @@ export const FacturasView = ({
                         <div className="truncate text-slate-700 dark:text-slate-300 font-medium" title={factura.concepto}>
                           {factura.concepto || 'Servicios Profesionales de Psicología'}
                         </div>
-                        <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+                        <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
                           <span>Pago: {factura.condicionVenta}</span>
                           {factura.numeroAfiliado && <span>• Afil: {factura.numeroAfiliado}</span>}
                         </div>
@@ -596,7 +606,7 @@ export const FacturasView = ({
 
                       {/* Total */}
                       <td className="px-4 py-3 text-right">
-                        <div className="text-xs font-bold text-slate-900 dark:text-white font-mono">
+                        <div className="text-xs font-semibold text-slate-900 dark:text-white font-mono">
                           ${Number(factura.total).toLocaleString('es-AR')}
                         </div>
                       </td>
@@ -606,7 +616,7 @@ export const FacturasView = ({
                         <button
                           onClick={() => onUpdateFacturaEstado(factura.id, isCobrada ? 'Pendiente' : 'Cobrada')}
                           title="Click para cambiar estado"
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold transition-all cursor-pointer ${
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
                             isCobrada
                               ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                               : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
@@ -662,7 +672,7 @@ export const FacturasView = ({
       {/* Modal Emisión Factura / Recibo con ARCA */}
       {isModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-[var(--shadow-pop)] space-y-4 max-h-[92vh] overflow-y-auto">
             
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
@@ -670,13 +680,13 @@ export const FacturasView = ({
                   <Receipt size={18} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold font-display text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold font-display text-slate-900 dark:text-white flex items-center gap-1.5">
                     {editingFactura ? 'Editar Comprobante' : 'Emisión de Factura Fiscal Oficial'}
-                    <span className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-bold rounded border border-emerald-500/20">
+                    <span className="text-[11px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-semibold rounded border border-emerald-500/20">
                       ARCA WSFE
                     </span>
                   </h3>
-                  <p className="text-[11px] text-slate-400">Comprobante electrónico válido para reintegros y obras sociales</p>
+                  <p className="text-[12px] text-slate-400">Comprobante electrónico válido para reintegros y obras sociales</p>
                 </div>
               </div>
               <button
@@ -694,7 +704,7 @@ export const FacturasView = ({
                 onClick={() => handleSelectModalidad('reintegro_paciente')}
                 className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
                   modalidadEmision === 'reintegro_paciente'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
@@ -707,7 +717,7 @@ export const FacturasView = ({
                 onClick={() => handleSelectModalidad('directo_obra_social')}
                 className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
                   modalidadEmision === 'directo_obra_social'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
@@ -720,7 +730,7 @@ export const FacturasView = ({
                 onClick={() => handleSelectModalidad('particular')}
                 className={`flex-1 py-1.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 ${
                   modalidadEmision === 'particular'
-                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-sm'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
@@ -755,7 +765,7 @@ export const FacturasView = ({
                     value={formNumeroFactura}
                     onChange={(e) => setFormNumeroFactura(e.target.value)}
                     placeholder="0001-00000146"
-                    className="input-field text-xs font-mono font-bold"
+                    className="input-field text-xs font-mono font-semibold"
                     required
                   />
                 </div>
@@ -776,19 +786,19 @@ export const FacturasView = ({
 
               {/* Cobertura de Obra Social y Nomenclador */}
               <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 space-y-2.5">
-                <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-[12px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Building2 size={13} /> Cobertura Médica & Código Nomenclador de Salud Mental
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-[12px] text-slate-600 dark:text-slate-400 mb-1">
                       Obra Social / Prepaga
                     </label>
                     <select
                       value={formObraSocialId}
                       onChange={(e) => handleSelectObraSocialFiscal(e.target.value)}
-                      className="input-field text-xs font-bold"
+                      className="input-field text-xs font-semibold"
                     >
                       {OBRAS_SOCIALES_FISCALES.map(os => (
                         <option key={os.id} value={os.id}>{os.sigla} ({os.tipo})</option>
@@ -798,7 +808,7 @@ export const FacturasView = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-[12px] text-slate-600 dark:text-slate-400 mb-1">
                       N° Afiliado / Credencial
                     </label>
                     <input
@@ -811,7 +821,7 @@ export const FacturasView = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-[12px] text-slate-600 dark:text-slate-400 mb-1">
                       Prestación Nomenclada
                     </label>
                     <select
@@ -831,7 +841,7 @@ export const FacturasView = ({
                 {/* Período de servicio para ARCA */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 border-t border-emerald-200/50 dark:border-emerald-900/40">
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Servicio Desde (ARCA):</label>
+                    <label className="block text-[11px] text-slate-500 mb-1">Servicio Desde (ARCA):</label>
                     <input
                       type="date"
                       value={formFechaServicioDesde}
@@ -840,7 +850,7 @@ export const FacturasView = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Servicio Hasta (ARCA):</label>
+                    <label className="block text-[11px] text-slate-500 mb-1">Servicio Hasta (ARCA):</label>
                     <input
                       type="date"
                       value={formFechaServicioHasta}
@@ -849,7 +859,7 @@ export const FacturasView = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Vencimiento para el Pago:</label>
+                    <label className="block text-[11px] text-slate-500 mb-1">Vencimiento para el Pago:</label>
                     <input
                       type="date"
                       value={formFechaVencimientoPago}
@@ -862,14 +872,14 @@ export const FacturasView = ({
 
               {/* Receptor */}
               <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2.5">
-                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                   <User size={12} /> Datos del Receptor / Facturado a
                 </span>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                   {modalidadEmision !== 'directo_obra_social' && (
                     <div>
-                      <label className="block text-[11px] text-slate-500 mb-1">
+                      <label className="block text-[12px] text-slate-500 mb-1">
                         Seleccionar Paciente
                       </label>
                       <select
@@ -886,7 +896,7 @@ export const FacturasView = ({
                   )}
 
                   <div className={modalidadEmision === 'directo_obra_social' ? 'md:col-span-2' : ''}>
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[12px] text-slate-500 mb-1">
                       {modalidadEmision === 'directo_obra_social' ? 'Razón Social de la Obra Social' : 'Nombre y Apellido'}
                     </label>
                     <input
@@ -900,11 +910,11 @@ export const FacturasView = ({
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] text-slate-500">
+                      <label className="text-[12px] text-slate-500">
                         {modalidadEmision === 'directo_obra_social' ? 'CUIT Entidad' : 'DNI / CUIT'}
                       </label>
                       {cuitVal && (
-                        <span className={`text-[9px] font-bold ${cuitVal.valido ? 'text-emerald-500' : 'text-amber-500'}`}>
+                        <span className={`text-[10.5px] font-semibold ${cuitVal.valido ? 'text-emerald-500' : 'text-amber-500'}`}>
                           {cuitVal.valido ? '✓ CUIT Válido' : '⚠️ No es CUIT M11'}
                         </span>
                       )}
@@ -921,7 +931,7 @@ export const FacturasView = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1">
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[12px] text-slate-500 mb-1">
                       Condición IVA Receptor
                     </label>
                     <select
@@ -937,7 +947,7 @@ export const FacturasView = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[12px] text-slate-500 mb-1">
                       Condición de Pago
                     </label>
                     <select
@@ -953,7 +963,7 @@ export const FacturasView = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[12px] text-slate-500 mb-1">
                       Período Facturado
                     </label>
                     <input
@@ -970,7 +980,7 @@ export const FacturasView = ({
               {/* Items Table */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Detalle de Prestaciones Psicológicas
                   </span>
                   <button
@@ -1003,7 +1013,7 @@ export const FacturasView = ({
                           placeholder="Cant."
                           value={item.cantidad}
                           onChange={(e) => handleItemChange(idx, 'cantidad', e.target.value)}
-                          className="input-field text-xs text-center font-bold"
+                          className="input-field text-xs text-center font-semibold"
                           required
                         />
                       </div>
@@ -1015,11 +1025,11 @@ export const FacturasView = ({
                           placeholder="Precio Unit."
                           value={item.precioUnitario}
                           onChange={(e) => handleItemChange(idx, 'precioUnitario', e.target.value)}
-                          className="input-field text-xs text-right font-bold"
+                          className="input-field text-xs text-right font-semibold"
                           required
                         />
                       </div>
-                      <div className="w-24 text-right font-bold text-xs text-emerald-600 dark:text-emerald-400 pr-1">
+                      <div className="w-24 text-right font-semibold text-xs text-emerald-600 dark:text-emerald-400 pr-1">
                         ${Number(item.total).toLocaleString('es-AR')}
                       </div>
                       {items.length > 1 && (
@@ -1038,8 +1048,8 @@ export const FacturasView = ({
                 {/* Subtotal */}
                 <div className="flex justify-end pt-1">
                   <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-right min-w-[200px]">
-                    <span className="text-[11px] text-slate-500">Total Comprobante:</span>
-                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="text-[12px] text-slate-500">Total Comprobante:</span>
+                    <div className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
                       ${calculateSubtotal().toLocaleString('es-AR')}
                     </div>
                   </div>
@@ -1047,9 +1057,9 @@ export const FacturasView = ({
               </div>
 
               {/* Fiscal CAE / ARCA */}
-              <div className="p-3 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-teal-950/40 rounded-2xl border border-emerald-500/30 space-y-2.5">
+              <div className="p-3 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-[12px] font-semibold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
                     <QrCode size={13} /> Autorización Electrónica ARCA (WSFE v1)
                   </span>
                   
@@ -1057,7 +1067,7 @@ export const FacturasView = ({
                     type="button"
                     onClick={handleAuthorizeArca}
                     disabled={isAuthorizingArca}
-                    className="px-3 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1"
+                    className="px-3 py-1 bg-emerald-500 hover:bg-emerald-400 text-[#f4f1e8] font-semibold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1"
                   >
                     <RefreshCw size={12} className={isAuthorizingArca ? 'animate-spin' : ''} />
                     <span>{isAuthorizingArca ? 'Autorizando en ARCA...' : 'Solicitar CAE a ARCA'}</span>
@@ -1066,7 +1076,7 @@ export const FacturasView = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-[10px] text-slate-400 mb-1">
+                    <label className="block text-[11px] text-slate-400 mb-1">
                       Código CAE Obtenido
                     </label>
                     <input
@@ -1074,12 +1084,12 @@ export const FacturasView = ({
                       value={formCae}
                       onChange={(e) => setFormCae(e.target.value)}
                       placeholder="75392019482910"
-                      className="input-field text-xs font-mono font-bold bg-slate-950 text-emerald-400 border-emerald-900/60"
+                      className="input-field text-xs font-mono font-semibold bg-slate-950 text-emerald-400 border-emerald-900/60"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-400 mb-1">
+                    <label className="block text-[11px] text-slate-400 mb-1">
                       Vencimiento CAE
                     </label>
                     <input
@@ -1093,7 +1103,7 @@ export const FacturasView = ({
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">
+                <label className="block text-[12px] text-slate-500 mb-1">
                   Observaciones / Leyenda para Auditoría de Reintegro
                 </label>
                 <input
@@ -1116,7 +1126,7 @@ export const FacturasView = ({
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary text-xs py-2 px-4 font-bold flex items-center gap-1.5"
+                  className="btn btn-primary text-xs py-2 px-4 font-semibold flex items-center gap-1.5"
                 >
                   <Check size={14} />
                   <span>Guardar y Emitir Comprobante</span>

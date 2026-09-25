@@ -78,14 +78,19 @@ export const FinanzasView = ({
     <div className="space-y-5 animate-fade-in">
       
       {/* Header Finanzas */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
-            <Wallet size={24} className="text-emerald-600 dark:text-emerald-400" />
-            Finanzas, Caja & Honorarios
+          <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[13px] font-medium text-emerald-700 dark:text-emerald-300">Finanzas & Caja</span>
+          </div>
+          <h2 className="font-serif text-[2.1rem] sm:text-[2.6rem] leading-[1.04] text-slate-900 dark:text-slate-50 flex items-center gap-2.5">
+            <div className="hidden" aria-hidden="true">
+              <Wallet size={18} />
+            </div>
+            <span>Finanzas, Caja & Honorarios</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Balance general de cobros en consultorio/transferencias y liquidaciones de obras sociales.
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-2 max-w-2xl">
+            Balance general de cobros en consultorio, transferencias bancarias y liquidaciones de mutuales.
           </p>
         </div>
 
@@ -100,7 +105,7 @@ export const FinanzasView = ({
             }
             alert('Generando reporte financiero en formato Excel...');
           }}
-          className="btn btn-secondary text-xs flex items-center gap-1.5 self-start md:self-auto"
+          className="btn btn-secondary text-xs flex items-center gap-1.5 shadow-xs self-start md:self-auto"
         >
           <span>Exportar Balance (Excel)</span>
           {subscription?.plan !== 'pro' && <ProBadge size="xs" text="PRO" />}
@@ -108,56 +113,56 @@ export const FinanzasView = ({
       </div>
 
       {/* 4 Cards de Balance */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="card p-4.5 flex items-center justify-between card-glow-emerald">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Caja Cobrada</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-emerald-700 dark:text-emerald-400 mt-1">
+            <p className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Caja Cobrada</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-emerald-700 dark:text-emerald-400 mt-1.5 tabular-nums tracking-tight">
               ${totalCosegurosCobrados.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">Efectivo / Transferencias</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Efectivo / Transferencias</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
             <DollarSign size={18} />
           </div>
         </div>
 
-        <div className="card p-4.5 flex items-center justify-between card-glow-amber">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Pendientes</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-amber-700 dark:text-amber-400 mt-1">
+            <p className="text-[12px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Pendientes</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-amber-700 dark:text-amber-400 mt-1.5 tabular-nums tracking-tight">
               ${totalCosegurosPendientes.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">A cobrar en sesión</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">A cobrar en sesión</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 flex items-center justify-center border border-amber-100 dark:border-amber-900">
+          <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-105 transition-transform">
             <Clock size={18} />
           </div>
         </div>
 
-        <div className="card p-4.5 flex items-center justify-between">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">O.S. Cobradas</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-emerald-700 dark:text-emerald-400 mt-1">
+            <p className="text-[12px] font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">O.S. Cobradas</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-1.5 tabular-nums tracking-tight">
               ${totalOSCobrado.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">Cobrado en banco</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Cobrado en banco</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+          <div className="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-105 transition-transform">
             <CheckCircle2 size={18} />
           </div>
         </div>
 
-        <div className="card p-4.5 flex items-center justify-between">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">O.S. en Trámite</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
+            <p className="text-[12px] font-semibold text-sky-700 dark:text-sky-400 uppercase tracking-wider">O.S. en Trámite</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-1.5 tabular-nums tracking-tight">
               ${totalOSLiquidando.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">Planillas presentadas</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Planillas presentadas</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-600 flex items-center justify-center border border-sky-100 dark:border-sky-900">
+          <div className="w-10 h-10 rounded-2xl bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-105 transition-transform">
             <TrendingUp size={18} />
           </div>
         </div>
@@ -170,7 +175,7 @@ export const FinanzasView = ({
         {/* Sede Cards (2 Cols) */}
         <div className="lg:col-span-2 card p-4 sm:p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Building2 size={16} className="text-emerald-600 dark:text-emerald-400" />
               <span>Rendimiento por Sede (Corrientes)</span>
             </h3>
@@ -185,13 +190,13 @@ export const FinanzasView = ({
               return (
                 <div key={sede.id} className="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className={`badge ${sede.badgeClass} text-[10px]`}>
+                    <span className={`badge ${sede.badgeClass} text-[11px]`}>
                       {sede.nombre.split('-')[0].trim()}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400">{porcentaje}%</span>
+                    <span className="text-[11px] font-semibold text-slate-400">{porcentaje}%</span>
                   </div>
                   
-                  <h4 className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+                  <h4 className="text-lg font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">
                     ${monto.toLocaleString('es-AR')}
                   </h4>
 
@@ -199,7 +204,7 @@ export const FinanzasView = ({
                     <div className="bg-emerald-600 h-1 rounded-full" style={{ width: `${porcentaje}%` }} />
                   </div>
 
-                  <p className="text-[10px] text-slate-500 truncate">
+                  <p className="text-[11px] text-slate-500 truncate">
                     {sede.direccion}
                   </p>
                 </div>
@@ -210,7 +215,7 @@ export const FinanzasView = ({
 
         {/* Medios de Pago Breakdown (1 Col) */}
         <div className="card p-4 sm:p-5 space-y-3">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
             <CreditCard size={16} className="text-emerald-600 dark:text-emerald-400" />
             <span>Medios de Pago</span>
           </h3>
@@ -219,7 +224,7 @@ export const FinanzasView = ({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-slate-600 dark:text-slate-300">Efectivo</span>
-                <span className="font-bold font-mono text-slate-900 dark:text-white">${efectivoTotal.toLocaleString('es-AR')}</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">${efectivoTotal.toLocaleString('es-AR')}</span>
               </div>
               <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                 <div 
@@ -232,7 +237,7 @@ export const FinanzasView = ({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-slate-600 dark:text-slate-300">Transferencia</span>
-                <span className="font-bold font-mono text-slate-900 dark:text-white">${transferenciaTotal.toLocaleString('es-AR')}</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">${transferenciaTotal.toLocaleString('es-AR')}</span>
               </div>
               <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                 <div 
@@ -245,7 +250,7 @@ export const FinanzasView = ({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-slate-600 dark:text-slate-300">Mercado Pago</span>
-                <span className="font-bold font-mono text-slate-900 dark:text-white">${mercadoPagoTotal.toLocaleString('es-AR')}</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">${mercadoPagoTotal.toLocaleString('es-AR')}</span>
               </div>
               <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                 <div 
@@ -262,7 +267,7 @@ export const FinanzasView = ({
       {/* Tabla de Movimientos / Cobros de Turnos */}
       <div className="card p-0 overflow-hidden">
         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             Registro de Cobros de Sesiones
           </h3>
 
@@ -283,7 +288,7 @@ export const FinanzasView = ({
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="py-2.5 px-4">Fecha / Hora</th>
                 <th className="py-2.5 px-4">Paciente</th>
@@ -315,7 +320,7 @@ export const FinanzasView = ({
                       </td>
                       <td className="py-3 px-4">
                         {sede && (
-                          <span className={`badge ${sede.badgeClass} text-[10px]`}>
+                          <span className={`badge ${sede.badgeClass} text-[11px]`}>
                             {sede.nombre.split('-')[0].trim()}
                           </span>
                         )}
@@ -323,11 +328,11 @@ export const FinanzasView = ({
                       <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                         {t.medioPago}
                       </td>
-                      <td className="py-3 px-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                      <td className="py-3 px-4 text-right font-semibold font-mono text-emerald-600 dark:text-emerald-400">
                         ${t.coseguroMonto?.toLocaleString('es-AR')}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className={`badge text-[10px] ${
+                        <span className={`badge text-[11px] ${
                           t.coseguroEstado === 'Cobrado' 
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
                             : 'bg-amber-50 text-amber-700 border border-amber-200'

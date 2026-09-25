@@ -1,7 +1,7 @@
+import { BrandMark } from '../Common/BrandMark';
 import React, { useState } from 'react';
 import { 
   X, 
-  HeartPulse, 
   User, 
   Mail, 
   Lock, 
@@ -99,15 +99,14 @@ export const AuthModal = ({
       {/* Backdrop */}
       <div 
         onClick={onClose}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md" 
+        className="fixed inset-0 bg-slate-950/45 backdrop-blur-[6px] animate-[backdropIn_.2s_ease-out]" 
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#0b1612] text-slate-900 dark:text-white rounded-3xl border border-emerald-500/30 shadow-2xl overflow-hidden z-10 my-auto">
+      <div className="relative w-full max-w-lg bg-[var(--bg-card)] text-[var(--text-main)] rounded-2xl border border-[var(--border-color)] shadow-[var(--shadow-pop)] overflow-hidden z-10 my-auto animate-[fadeIn_.28s_cubic-bezier(.23,1,.32,1)]">
         
         {/* Top pattern bar */}
-        <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 w-full" />
-
+        
         {/* Close button */}
         <button
           onClick={onClose}
@@ -120,11 +119,9 @@ export const AuthModal = ({
           
           {/* Logo & Header */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-emerald-600/30">
-              <HeartPulse size={22} />
-            </div>
+            <BrandMark size={40} />
             <div>
-              <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white">
+              <h3 className="font-serif text-[1.75rem] leading-tight text-slate-900 dark:text-white">
                 {mode === 'register' ? 'Creá tu cuenta en PsicoPlus' : 'Iniciar Sesión'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-emerald-300/70">
@@ -140,7 +137,7 @@ export const AuthModal = ({
             <button
               type="button"
               onClick={() => { setMode('register'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-[13px] font-medium rounded-lg transition-all ${
                 mode === 'register' 
                   ? 'bg-white dark:bg-emerald-700 text-slate-900 dark:text-white shadow-xs' 
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -151,7 +148,7 @@ export const AuthModal = ({
             <button
               type="button"
               onClick={() => { setMode('login'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-[13px] font-medium rounded-lg transition-all ${
                 mode === 'login' 
                   ? 'bg-white dark:bg-emerald-700 text-slate-900 dark:text-white shadow-xs' 
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -163,7 +160,7 @@ export const AuthModal = ({
 
           {error && (
             <div className="p-3 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-medium">
-              ⚠️ {error}
+              {error}
             </div>
           )}
 
@@ -171,7 +168,7 @@ export const AuthModal = ({
             
             {mode === 'register' && (
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+                <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                   Nombre Completo y Título *
                 </label>
                 <div className="relative">
@@ -189,7 +186,7 @@ export const AuthModal = ({
             )}
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+              <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Correo Electrónico *
               </label>
               <div className="relative">
@@ -206,7 +203,7 @@ export const AuthModal = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+              <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                 Contraseña *
               </label>
               <div className="relative">
@@ -226,7 +223,7 @@ export const AuthModal = ({
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+                    <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                       Matrícula Provincial
                     </label>
                     <div className="relative">
@@ -242,7 +239,7 @@ export const AuthModal = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+                    <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                       WhatsApp Consultorio
                     </label>
                     <div className="relative">
@@ -259,7 +256,7 @@ export const AuthModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-emerald-200/80 uppercase tracking-wider mb-1">
+                  <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                     Nombre o Sede de tu Consultorio
                   </label>
                   <div className="relative">
@@ -279,7 +276,7 @@ export const AuthModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-[14px] rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span>Procesando...</span>

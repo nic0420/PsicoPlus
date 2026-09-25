@@ -40,6 +40,7 @@ export const AgendaView = ({
   const [filterSede, setFilterSede] = useState(selectedSedeId || 'all');
   const [filterEstado, setFilterEstado] = useState('all');
   const [selectedFecha, setSelectedFecha] = useState('2026-09-01'); // Fecha demo activa
+  const [agendaViewMode, setAgendaViewMode] = useState('grid'); // 'grid' | 'list'
   const [editingTurno, setEditingTurno] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -152,21 +153,26 @@ export const AgendaView = ({
     <div className="space-y-5 animate-fade-in">
       
       {/* Header de la Agenda */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
-            <CalendarIcon size={24} className="text-emerald-600 dark:text-emerald-400" />
-            Agenda Multisede
+          <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[13px] font-medium text-emerald-700 dark:text-emerald-300">Control de Turnos</span>
+          </div>
+          <h2 className="font-serif text-[2.1rem] sm:text-[2.6rem] leading-[1.04] text-slate-900 dark:text-slate-50 flex items-center gap-2.5">
+            <div className="hidden" aria-hidden="true">
+              <CalendarIcon size={18} />
+            </div>
+            <span>Agenda Multisede</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Gestión de turnos organizados por sede, modalidad y control de coseguros.
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-2 max-w-2xl">
+            Gestión integral de turnos organizados por sede, modalidad y cobranza de coseguros.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+        <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
           <button 
             onClick={handleCopyPortalLink}
-            className="btn btn-secondary text-xs flex items-center gap-1.5"
+            className="btn btn-secondary text-xs flex items-center gap-1.5 shadow-xs"
             title="Copiar link para que los pacientes reserven online"
           >
             {copiedLink ? <Check size={14} className="text-emerald-600" /> : <Share2 size={14} />}
@@ -178,7 +184,7 @@ export const AgendaView = ({
               handleResetForm();
               onOpenNuevoTurno();
             }}
-            className="btn btn-primary text-xs"
+            className="btn btn-primary text-xs shadow-sm"
           >
             <Plus size={15} />
             <span>Agendar Turno</span>
@@ -187,7 +193,7 @@ export const AgendaView = ({
       </div>
 
       {/* Barra de Filtros y Fechas */}
-      <div className="card p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-card p-4 sm:p-4.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-sm border border-emerald-500/15">
         
         {/* Selector de Fecha */}
         <div className="flex flex-wrap items-center gap-2">
@@ -195,17 +201,17 @@ export const AgendaView = ({
             type="date"
             value={selectedFecha}
             onChange={(e) => setSelectedFecha(e.target.value)}
-            className="input-field py-1.5 px-3 text-xs w-auto font-mono font-medium"
+            className="input-field py-1.5 px-3 text-xs w-auto font-mono font-semibold"
           />
           <button
             onClick={() => setSelectedFecha('2026-09-01')}
-            className={`btn text-xs py-1.5 px-3 ${selectedFecha === '2026-09-01' ? 'btn-primary' : 'btn-secondary'}`}
+            className={`btn text-xs py-1.5 px-3 rounded-xl ${selectedFecha === '2026-09-01' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Hoy (Demo)
           </button>
           <button
             onClick={() => setSelectedFecha('')}
-            className={`btn text-xs py-1.5 px-3 ${!selectedFecha ? 'btn-primary' : 'btn-secondary'}`}
+            className={`btn text-xs py-1.5 px-3 rounded-xl ${!selectedFecha ? 'btn-primary' : 'btn-secondary'}`}
           >
             Todos los Días
           </button>
@@ -214,11 +220,11 @@ export const AgendaView = ({
         {/* Filtros por Sede y Estado */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <Filter size={13} className="text-slate-400" />
+            <Filter size={13} className="text-emerald-600 dark:text-emerald-400" />
             <select
               value={filterSede}
               onChange={(e) => setFilterSede(e.target.value)}
-              className="input-field py-1.5 px-2.5 text-xs w-auto"
+              className="input-field py-1.5 px-2.5 text-xs w-auto font-medium"
             >
               <option value="all">Todas las Sedes</option>
               {sedes.map(s => (
@@ -230,7 +236,7 @@ export const AgendaView = ({
           <select
             value={filterEstado}
             onChange={(e) => setFilterEstado(e.target.value)}
-            className="input-field py-1.5 px-2.5 text-xs w-auto"
+            className="input-field py-1.5 px-2.5 text-xs w-auto font-medium"
           >
             <option value="all">Todos los Estados</option>
             <option value="Solicitado (Web)">🌐 Solicitado (Web)</option>
@@ -241,19 +247,46 @@ export const AgendaView = ({
             <option value="Ausente sin aviso">Ausente s/ aviso</option>
             <option value="Cancelado">Cancelado</option>
           </select>
+
+          {/* View Mode Toggle (Grilla Horaria vs Lista) */}
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-emerald-950/40 p-1 rounded-xl border border-emerald-500/20">
+            <button
+              type="button"
+              onClick={() => setAgendaViewMode('grid')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+                agendaViewMode === 'grid'
+                  ? 'bg-white dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+              }`}
+            >
+              <Clock size={12} />
+              <span>Grilla Horaria</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAgendaViewMode('list')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+                agendaViewMode === 'list'
+                  ? 'bg-white dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+              }`}
+            >
+              <span>Lista</span>
+            </button>
+          </div>
         </div>
 
       </div>
 
       {/* Lista de Turnos */}
       {filteredTurnos.length === 0 ? (
-        <div className="card text-center py-12 text-slate-400">
-          <Clock size={36} className="mx-auto mb-2 opacity-40 text-slate-400" />
-          <h3 className="font-bold text-xs text-slate-700 dark:text-slate-200">No hay turnos para los filtros seleccionados</h3>
-          <p className="text-[11px] text-slate-500 mt-0.5">Prueba cambiando la fecha o agregando un nuevo turno.</p>
+        <div className="glass-card rounded-2xl text-center py-14 text-slate-400">
+          <Clock size={40} className="mx-auto mb-2 text-emerald-500/60" />
+          <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-200">No hay turnos para los filtros seleccionados</h3>
+          <p className="text-xs text-slate-500 mt-1">Prueba cambiando la fecha o agendando un nuevo turno.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2.5">
+        <div className="grid grid-cols-1 gap-3">
           {filteredTurnos.map((turno) => {
             const pac = getPacienteById(turno.pacienteId);
             const os = pac ? getObraSocialById(pac.obraSocialId) : null;
@@ -264,6 +297,15 @@ export const AgendaView = ({
             const pacOs = os?.nombre || turno.pacienteObraSocial || 'Particular';
 
             const isWebRequested = turno.estado === 'Solicitado (Web)';
+            const borderAccent = isWebRequested 
+              ? 'border-l-4 border-l-teal-400' 
+              : turno.estado === 'Atendido' 
+              ? 'border-l-4 border-l-emerald-500' 
+              : turno.estado === 'Confirmado' 
+              ? 'border-l-4 border-l-emerald-600' 
+              : turno.estado === 'Por Confirmar' 
+              ? 'border-l-4 border-l-amber-500' 
+              : 'border-l-4 border-l-rose-500';
 
             const waLink = pacTel ? generateWhatsappLink(
               pacTel,
@@ -282,9 +324,9 @@ export const AgendaView = ({
             return (
               <div 
                 key={turno.id}
-                className={`card p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-all ${
+                className={`glass-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-2xl shadow-sm hover:shadow-md transition-all ${borderAccent} ${
                   isWebRequested 
-                    ? 'border-emerald-300 dark:border-emerald-700/80 bg-emerald-50/20 dark:bg-emerald-950/20' 
+                    ? 'border-emerald-300 dark:border-emerald-600/50 bg-emerald-50/40 dark:bg-emerald-950/40 ring-1 ring-emerald-500/30' 
                     : ''
                 }`}
               >
@@ -293,47 +335,47 @@ export const AgendaView = ({
                 <div className="flex items-start gap-3.5">
                   
                   {/* Badge de Horario */}
-                  <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 rounded-xl p-2.5 text-center min-w-[76px]">
-                    <span className="text-sm font-bold text-slate-900 dark:text-white font-mono block">
+                  <div className="bg-emerald-50/80 dark:bg-emerald-950/50 border border-emerald-500/20 rounded-2xl p-2.5 text-center min-w-[80px] shadow-xs">
+                    <span className="text-sm font-semibold text-emerald-950 dark:text-emerald-200 font-mono block">
                       {turno.horaInicio}
                     </span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                    <span className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 font-semibold block">
                       {turno.horaFin}
                     </span>
-                    <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 block">
+                    <span className="text-[10.5px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 block font-mono">
                       {turno.fecha}
                     </span>
                   </div>
 
                   {/* Datos del Paciente */}
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 
                         onClick={() => pac && onOpenPacienteDetalle(pac)}
-                        className="font-bold text-sm text-slate-900 dark:text-white hover:text-emerald-600 cursor-pointer"
+                        className={`font-semibold text-sm text-slate-900 dark:text-white hover:text-emerald-600 transition-colors cursor-pointer ${privacyMode ? 'privacy-blur' : ''}`}
                       >
                         {pacNombre}
                       </h3>
                       
                       {sede && (
-                        <span className={`badge ${sede.badgeClass} text-[10px]`}>
+                        <span className={`badge ${sede.badgeClass} text-[11px]`}>
                           {sede.nombre.split('-')[0].trim()}
                         </span>
                       )}
 
-                      <span className={`badge text-[10px] font-bold ${
-                        turno.estado === 'Solicitado (Web)' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200' :
-                        turno.estado === 'Atendido' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200' :
-                        turno.estado === 'Confirmado' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200' :
-                        turno.estado === 'Por Confirmar' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200' :
-                        'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200'
+                      <span className={`status-pill ${
+                        turno.estado === 'Solicitado (Web)' ? 'warning' :
+                        turno.estado === 'Atendido' ? 'success' :
+                        turno.estado === 'Confirmado' ? 'info' :
+                        turno.estado === 'Por Confirmar' ? 'warning' :
+                        'danger'
                       }`}>
                         {turno.estado}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                      <span><strong>DNI:</strong> {pacDni}</span>
+                      <span className={privacyMode ? 'privacy-blur' : ''}><strong>DNI:</strong> {pacDni}</span>
                       <span>•</span>
                       <span><strong>Cobertura:</strong> {pacOs}</span>
                       <span>•</span>
@@ -342,21 +384,21 @@ export const AgendaView = ({
 
                     {/* Coseguro */}
                     <div className="flex flex-wrap items-center gap-2 text-xs pt-0.5">
-                      <span className="inline-flex items-center gap-1 font-semibold text-slate-800 dark:text-slate-200">
+                      <span className={`inline-flex items-center gap-1 font-semibold text-slate-800 dark:text-slate-200 ${privacyMode ? 'privacy-blur' : ''}`}>
                         <DollarSign size={13} className="text-emerald-600" />
                         Coseguro: ${turno.coseguroMonto?.toLocaleString('es-AR') || 0}
                       </span>
-                      <span className={`badge text-[10px] ${
+                      <span className={`badge text-[11px] ${
                         turno.coseguroEstado === 'Cobrado' 
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40 font-semibold' 
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/40 font-semibold'
                       }`}>
                         {turno.coseguroEstado} ({turno.medioPago})
                       </span>
                     </div>
 
                     {turno.notas && (
-                      <p className={`text-[11px] text-slate-500 dark:text-slate-400 italic ${privacyMode ? 'privacy-blur' : ''}`}>
+                      <p className={`text-[12px] text-slate-500 dark:text-slate-400 italic ${privacyMode ? 'privacy-blur' : ''}`}>
                         💬 {turno.notas}
                       </p>
                     )}
@@ -364,12 +406,12 @@ export const AgendaView = ({
                 </div>
 
                 {/* Acciones del Turno */}
-                <div className="flex flex-wrap items-center gap-1.5 self-end md:self-center">
+                <div className="flex flex-wrap items-center gap-2 self-end md:self-center">
                   
                   {isWebRequested && (
                     <button
                       onClick={() => onActualizarTurnoEstado(turno.id, 'Confirmado')}
-                      className="btn btn-primary text-xs py-1.5 px-3"
+                      className="btn btn-primary text-xs py-1.5 px-3.5 shadow-sm"
                       title="Aprobar solicitud web y confirmar turno"
                     >
                       <CheckCircle2 size={14} />
@@ -380,7 +422,7 @@ export const AgendaView = ({
                   <select
                     value={turno.estado}
                     onChange={(e) => onActualizarTurnoEstado(turno.id, e.target.value)}
-                    className="input-field py-1.5 px-2 text-xs w-auto"
+                    className="input-field py-1.5 px-2.5 text-xs w-auto font-semibold"
                   >
                     <option value="Confirmado">Confirmado</option>
                     <option value="Atendido">Atendido</option>
@@ -395,7 +437,7 @@ export const AgendaView = ({
                       href={waLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-whatsapp text-xs py-1.5 px-3"
+                      className="btn btn-whatsapp text-xs py-1.5 px-3.5"
                       title="Enviar recordatorio por WhatsApp"
                     >
                       <MessageCircle size={13} />
@@ -405,7 +447,7 @@ export const AgendaView = ({
 
                   <button
                     onClick={() => handleOpenEdit(turno)}
-                    className="btn btn-secondary text-xs py-1.5 px-2.5"
+                    className="btn btn-secondary text-xs py-1.5 px-3"
                     title="Editar detalles del turno"
                   >
                     <span>Editar</span>
@@ -417,10 +459,10 @@ export const AgendaView = ({
                         onDeleteTurno(turno.id);
                       }
                     }}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    className="p-2 text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                     title="Eliminar turno"
                   >
-                    <XCircle size={16} />
+                    <XCircle size={17} />
                   </button>
                 </div>
 
@@ -433,10 +475,10 @@ export const AgendaView = ({
       {/* MODAL: Nuevo / Editar Turno */}
       {isModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="card max-w-lg w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-4 max-h-[90vh] overflow-y-auto">
             
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold font-display text-slate-900 dark:text-white">
+              <h3 className="text-base font-semibold font-display text-slate-900 dark:text-white">
                 {editingTurno ? 'Editar Turno' : 'Agendar Nuevo Turno'}
               </h3>
               <button onClick={onCloseModal} className="text-slate-400 hover:text-slate-600">

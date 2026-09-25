@@ -34,6 +34,10 @@ export const ToastProvider = ({ children }) => {
     error: (msg, dur) => addToast(msg, 'error', dur),
     info: (msg, dur) => addToast(msg, 'info', dur),
     warning: (msg, dur) => addToast(msg, 'warning', dur),
+    showSuccess: (msg, dur) => addToast(msg, 'success', dur),
+    showError: (msg, dur) => addToast(msg, 'error', dur),
+    showInfo: (msg, dur) => addToast(msg, 'info', dur),
+    showWarning: (msg, dur) => addToast(msg, 'warning', dur),
   };
 
   const getIcon = (type) => {
@@ -53,14 +57,14 @@ export const ToastProvider = ({ children }) => {
   const getTypeStyle = (type) => {
     switch (type) {
       case 'success':
-        return 'border-emerald-200 dark:border-emerald-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-lg';
+        return 'border-emerald-200 dark:border-emerald-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-[var(--shadow-hover)]';
       case 'error':
-        return 'border-rose-200 dark:border-rose-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-lg';
+        return 'border-rose-200 dark:border-rose-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-[var(--shadow-hover)]';
       case 'warning':
-        return 'border-amber-200 dark:border-amber-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-lg';
+        return 'border-amber-200 dark:border-amber-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-[var(--shadow-hover)]';
       case 'info':
       default:
-        return 'border-indigo-200 dark:border-indigo-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-lg';
+        return 'border-indigo-200 dark:border-indigo-800/80 bg-white/95 dark:bg-slate-900/95 text-slate-800 dark:text-slate-100 shadow-[var(--shadow-hover)]';
     }
   };
 

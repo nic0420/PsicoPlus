@@ -194,20 +194,25 @@ export const PacientesView = ({
     <div className="space-y-5 animate-fade-in">
       
       {/* Header Pacientes */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
-            <Users size={24} className="text-emerald-600 dark:text-emerald-400" />
-            Directorio de Pacientes & Historias Clínicas
+          <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[13px] font-medium text-emerald-700 dark:text-emerald-300">Directorio Clínico</span>
+          </div>
+          <h2 className="font-serif text-[2.1rem] sm:text-[2.6rem] leading-[1.04] text-slate-900 dark:text-slate-50 flex items-center gap-2.5">
+            <div className="hidden" aria-hidden="true">
+              <Users size={18} />
+            </div>
+            <span>Pacientes & Historias Clínicas</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Fichas clínicas completas, cobertura de obras sociales y evoluciones de sesión.
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-2 max-w-2xl">
+            Fichas clínicas completas, control estricto de obras sociales y evoluciones de sesión.
           </p>
         </div>
 
         <button 
           onClick={handleOpenCreate}
-          className="btn btn-primary text-xs self-start md:self-auto"
+          className="btn btn-primary text-xs shadow-sm self-start md:self-auto"
         >
           <Plus size={15} />
           <span>Nuevo Paciente</span>
@@ -215,16 +220,16 @@ export const PacientesView = ({
       </div>
 
       {/* Barra de Búsqueda y Filtros */}
-      <div className="card p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-card p-4 sm:p-4.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-sm border border-emerald-500/15">
         
-        <div className="relative flex-1 min-w-[220px]">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div className="relative flex-1 min-w-[240px]">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600/70 dark:text-emerald-400/70" />
           <input 
             type="text"
             placeholder="Buscar por Nombre, DNI o N° de Afiliado..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field pl-9 text-xs"
+            className="input-field pl-10 text-xs font-medium"
           />
         </div>
 
@@ -232,7 +237,7 @@ export const PacientesView = ({
           <select
             value={filterOS}
             onChange={(e) => setFilterOS(e.target.value)}
-            className="input-field py-1.5 px-2.5 text-xs w-auto"
+            className="input-field py-1.5 px-3 text-xs w-auto font-medium"
           >
             <option value="all">Todas las Obras Sociales</option>
             {obrasSociales.map(os => (
@@ -243,7 +248,7 @@ export const PacientesView = ({
           <select
             value={filterSede}
             onChange={(e) => setFilterSede(e.target.value)}
-            className="input-field py-1.5 px-2.5 text-xs w-auto"
+            className="input-field py-1.5 px-3 text-xs w-auto font-medium"
           >
             <option value="all">Todas las Sedes</option>
             {sedes.map(s => (
@@ -255,7 +260,7 @@ export const PacientesView = ({
       </div>
 
       {/* Lista / Grid de Pacientes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPacientes.map((pac) => {
           const os = getObraSocialById(pac.obraSocialId);
           const sede = getSedeById(pac.sedeHabitualId);
@@ -268,73 +273,71 @@ export const PacientesView = ({
             <div 
               key={pac.id}
               onClick={() => onSelectPaciente(pac)}
-              className={`card p-4 sm:p-4.5 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 transition-all relative flex flex-col justify-between ${
-                selectedPaciente?.id === pac.id ? 'ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/20' : ''
+              className={`glass-card p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all relative flex flex-col justify-between group ${
+                selectedPaciente?.id === pac.id ? 'ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/30' : ''
               }`}
             >
               
               <div>
                 {/* Header del Card con Avatar e Iniciales */}
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600/20 to-teal-500/20 border border-emerald-400/30 text-emerald-800 dark:text-emerald-200 flex items-center justify-center font-semibold text-xs flex-shrink-0 shadow-xs">
                       {initials}
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight">
+                      <h3 className={`font-semibold text-sm text-slate-900 dark:text-white tracking-tight group-hover:text-emerald-600 transition-colors ${privacyMode ? 'privacy-blur' : ''}`}>
                         {pac.nombreCompleto}
                       </h3>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                      <p className={`text-[12px] text-slate-500 dark:text-slate-400 font-mono ${privacyMode ? 'privacy-blur' : ''}`}>
                         DNI: {pac.dni || 'Sin DNI'}
                       </p>
                     </div>
                   </div>
 
-                  <span className={`badge text-[10px] ${
-                    pac.estadoTratamiento === 'Activo' 
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200' 
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                  <span className={`status-pill ${
+                    pac.estadoTratamiento === 'Activo' ? 'success' : 'neutral'
                   }`}>
                     {pac.estadoTratamiento}
                   </span>
                 </div>
 
                 {/* Sede y Obra Social */}
-                <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                <div className="flex flex-wrap items-center gap-1.5 mt-3">
                   {sede && (
-                    <span className={`badge ${sede.badgeClass} text-[10px]`}>
+                    <span className={`badge ${sede.badgeClass} text-[11px]`}>
                       {sede.nombre.split('-')[0].trim()}
                     </span>
                   )}
 
-                  <span className="badge bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px]">
+                  <span className="badge bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
                     {os?.nombre || 'Particular'}
                   </span>
                 </div>
 
                 {/* Motivo de consulta */}
                 {pac.motivoConsulta && (
-                  <p className={`text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-2 italic ${privacyMode ? 'privacy-blur' : ''}`}>
+                  <p className={`text-xs text-slate-600 dark:text-slate-300 mt-2.5 line-clamp-2 italic ${privacyMode ? 'privacy-blur' : ''}`}>
                     "{pac.motivoConsulta}"
                   </p>
                 )}
 
                 {/* Semáforo de Sesiones */}
                 {pac.obraSocialId !== 'particular' && (
-                  <div className="mt-3 p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-medium text-slate-600 dark:text-slate-400">
+                  <div className="mt-3.5 p-3 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-500/15 space-y-1.5">
+                    <div className="flex items-center justify-between text-[12px]">
+                      <span className="font-semibold text-slate-600 dark:text-slate-300">
                         Sesiones autorizadas:
                       </span>
-                      <span className={`font-semibold ${isAlerta ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                      <span className={`font-semibold ${isAlerta ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-300'}`}>
                         {pac.sesionesConsumidas}/{pac.sesionesAutorizadas} ({restantes} rest.)
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-700/80 rounded-full h-1.5 overflow-hidden">
                       <div 
                         className={`h-1.5 rounded-full transition-all ${
-                          isAlerta ? 'bg-amber-500' : 'bg-emerald-500'
+                          isAlerta ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-teal-400'
                         }`}
                         style={{ width: `${Math.min(100, (pac.sesionesConsumidas / pac.sesionesAutorizadas) * 100)}%` }}
                       />
@@ -344,13 +347,13 @@ export const PacientesView = ({
               </div>
 
               {/* Footer del Card */}
-              <div className="mt-3.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                <span className="inline-flex items-center gap-1 font-medium text-slate-600 dark:text-slate-400">
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[12px] text-slate-500 dark:text-slate-400">
+                <span className="inline-flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
                   <FileText size={13} className="text-emerald-600 dark:text-emerald-400" />
                   {evoCount} {evoCount === 1 ? 'evolución' : 'evoluciones'}
                 </span>
 
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
                   Abrir Ficha →
                 </span>
               </div>
@@ -363,13 +366,13 @@ export const PacientesView = ({
       {/* DRAWER / MODAL DE FICHA CLÍNICA */}
       {selectedPaciente && (
         <div className="modal-backdrop">
-          <div className="card max-w-3xl w-full p-5 sm:p-6 shadow-xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="card max-w-3xl w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-4 max-h-[92vh] overflow-y-auto">
             
             {/* Header del Perfil */}
             <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h3 className="text-lg font-bold font-display text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-semibold font-display text-slate-900 dark:text-white">
                     {selectedPaciente.nombreCompleto}
                   </h3>
                   <span className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 text-xs">
@@ -400,6 +403,21 @@ export const PacientesView = ({
                   <Edit3 size={13} />
                   <span>Editar</span>
                 </button>
+                {onDeletePaciente && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`¿Estás seguro/a de eliminar al paciente ${selectedPaciente.nombreCompleto}? Esta acción no se puede deshacer.`)) {
+                        onDeletePaciente(selectedPaciente.id);
+                        onSelectPaciente(null);
+                      }
+                    }}
+                    className="btn btn-secondary text-xs py-1 px-2.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-900"
+                    title="Eliminar paciente"
+                  >
+                    <Trash2 size={13} />
+                    <span>Eliminar</span>
+                  </button>
+                )}
                 <button
                   onClick={() => onSelectPaciente(null)}
                   className="p-1 text-slate-400 hover:text-slate-600"
@@ -451,7 +469,7 @@ export const PacientesView = ({
                 
                 {/* Datos de Cobertura */}
                 <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5">
-                  <h4 className="font-bold text-slate-800 dark:text-slate-200 uppercase text-[10px] tracking-wider">
+                  <h4 className="font-semibold text-slate-800 dark:text-slate-200 uppercase text-[11px] tracking-wider">
                     Cobertura de Salud & Obras Sociales
                   </h4>
                   
@@ -539,7 +557,7 @@ export const PacientesView = ({
               <div className="space-y-3.5">
                 
                 <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                  <h4 className="font-semibold text-slate-900 dark:text-white text-xs">
                     Registro Cronológico de Sesiones
                   </h4>
                   <button
@@ -570,16 +588,16 @@ export const PacientesView = ({
                         className="card p-3.5 space-y-1.5 border-l-4 border-l-emerald-600 bg-white dark:bg-slate-900"
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-emerald-700 dark:text-emerald-400 font-mono">
+                          <span className="font-semibold text-emerald-700 dark:text-emerald-400 font-mono">
                             Sesión #{evo.numeroSesion} • {evo.fecha} ({evo.hora} hs)
                           </span>
-                          <span className="badge bg-slate-100 text-slate-700 text-[10px]">
+                          <span className="badge bg-slate-100 text-slate-700 text-[11px]">
                             {getSedeById(evo.sedeId)?.nombre.split('-')[0].trim() || 'Sede Centro'}
                           </span>
                         </div>
 
                         {evo.motivo && (
-                          <h5 className="font-bold text-xs text-slate-900 dark:text-white">
+                          <h5 className="font-semibold text-xs text-slate-900 dark:text-white">
                             {evo.motivo}
                           </h5>
                         )}
@@ -596,7 +614,7 @@ export const PacientesView = ({
                           )}
                         </div>
 
-                        <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+                        <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px] text-slate-500">
                           <span>Coseguro: ${evo.montoCoseguro?.toLocaleString('es-AR') || 0} ({evo.pagoEstado})</span>
                         </div>
                       </div>
@@ -615,10 +633,10 @@ export const PacientesView = ({
                     <Download size={16} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">
+                    <h4 className="font-semibold text-xs text-slate-900 dark:text-white">
                       Constancia Oficial de Asistencia a Sesión
                     </h4>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[12px] text-slate-500">
                       Membretado con Matrícula Provincial (M.P. {config.matriculaProvincial || '1842'}).
                     </p>
                   </div>
@@ -681,10 +699,10 @@ export const PacientesView = ({
       {/* MODAL: NUEVA EVOLUCIÓN */}
       {isEvoModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-3.5 max-h-[90vh] overflow-y-auto">
+          <div className="card max-w-lg w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-3.5 max-h-[90vh] overflow-y-auto">
             
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
-              <h3 className="text-sm font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-sm font-semibold font-display text-slate-900 dark:text-white flex items-center gap-2">
                 <FileText size={16} className="text-emerald-600" />
                 Registrar Evolución Clínica
               </h3>
@@ -823,10 +841,10 @@ export const PacientesView = ({
       {/* MODAL: CREAR / EDITAR PACIENTE */}
       {isCreateModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="card max-w-2xl w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-4 max-h-[92vh] overflow-y-auto">
             
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold font-display text-slate-900 dark:text-white">
+              <h3 className="text-base font-semibold font-display text-slate-900 dark:text-white">
                 {formData.id ? 'Editar Paciente' : 'Nuevo Paciente'}
               </h3>
               <button onClick={onCloseCreateModal} className="text-slate-400 hover:text-slate-600">

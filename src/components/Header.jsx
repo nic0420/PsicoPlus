@@ -1,218 +1,216 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Building2, 
-  MapPin, 
-  Video, 
-  Eye, 
-  EyeOff, 
-  ShieldAlert, 
-  CalendarDays,
+import {
+  Building2,
+  MapPin,
+  Video,
+  Eye,
+  EyeOff,
+  ShieldAlert,
+  Layers,
   Globe,
   Menu,
-  HeartPulse,
   Search,
-  Sparkles
+  Sun,
+  Moon,
+  ChevronDown,
 } from 'lucide-react';
-import { ProBadge } from './Common/ProBadge';
 import { PLANS } from '../services/subscription';
+import { BrandMark } from './Common/BrandMark';
 
-export const Header = ({ 
-  sedes, 
-  selectedSedeId, 
-  onSelectSede, 
-  privacyMode, 
-  onTogglePrivacyMode, 
-  isDarkMode, 
+const TAB_TITLES = {
+  dashboard: 'Consultorio en vivo',
+  agenda: 'Agenda',
+  pacientes: 'Pacientes',
+  facturas: 'Facturación ARCA',
+  liquidaciones: 'Obras sociales',
+  finanzas: 'Finanzas',
+  'portal-pacientes': 'Portal de pacientes',
+  configuracion: 'Configuración',
+};
+
+const IconButton = ({ children, className = '', ...props }) => (
+  <button
+    {...props}
+    className={`h-9 min-w-9 px-2 inline-flex items-center justify-center gap-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06] active:scale-95 transition-[background-color,color,transform] duration-150 ${className}`}
+  >
+    {children}
+  </button>
+);
+
+export const Header = ({
+  activeTab = 'dashboard',
+  sedes = [],
+  selectedSedeId = 'all',
+  onSelectSede,
+  privacyMode = false,
+  onTogglePrivacyMode,
+  isDarkMode = false,
   onToggleDarkMode,
-  pacientesEnAlertaCount,
+  pacientesEnAlertaCount = 0,
   onNavigateAlerts,
   turnosWebPendientesCount = 0,
   onNavigatePortal,
-  onNavigateAgenda,
   onOpenMobileMenu,
   onOpenSearch,
   subscription = { plan: PLANS.FREE },
-  onOpenUpgradeModal,
-  onSignOut
 }) => {
   const [time, setTime] = useState(new Date());
   const isPro = subscription.plan === PLANS.PRO;
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    const timer = setInterval(() => setTime(new Date()), 15000);
     return () => clearInterval(timer);
   }, []);
 
   const getSedeIcon = (id) => {
-    if (id === 'sede-centro') return <Building2 size={14} className="text-emerald-600 dark:text-emerald-400" />;
-    if (id === 'sede-sanmartin') return <MapPin size={14} className="text-rose-600 dark:text-rose-400" />;
-    if (id === 'sede-online') return <Video size={14} className="text-sky-600 dark:text-sky-400" />;
-    return <CalendarDays size={14} className="text-emerald-500" />;
+    if (id === 'sede-centro') return <Building2 size={14} />;
+    if (id === 'sede-sanmartin') return <MapPin size={14} />;
+    if (id === 'sede-online') return <Video size={14} />;
+    return <Building2 size={14} />;
   };
 
+  const shortName = (nombre = '') => nombre.split('-')[0].trim();
+  const dateLabel = time.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+
   return (
-    <header className="sticky top-0 z-30 w-full glass-panel border-b border-slate-200/80 dark:border-slate-800/80 transition-colors pt-safe">
-      <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3">
-        
-        {/* Mobile Left: Hamburger + Brand */}
-        <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={onOpenMobileMenu}
-            className="p-1.5 -ml-1 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-            title="Abrir menú"
-          >
+    <header className="sticky top-0 z-30 w-full pt-safe bg-[var(--bg-app)]/85 backdrop-blur-md border-b border-[var(--border-color)]">
+      <div className="h-14 md:h-16 flex items-center gap-3 px-3.5 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
+
+        {/* Mobile: menú + marca */}
+        <div className="flex items-center gap-1.5 md:hidden">
+          <IconButton onClick={onOpenMobileMenu} aria-label="Abrir menú" className="-ml-1.5">
             <Menu size={20} />
-          </button>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs">
-              <HeartPulse size={14} />
-            </div>
-            <span className="font-bold text-sm text-slate-900 dark:text-white font-display">PsicoPlus</span>
-          </div>
+          </IconButton>
+          <BrandMark size={28} />
         </div>
 
-        {/* Desktop Left: Sede Selector */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-emerald-50/90 dark:bg-emerald-950/60 p-1 rounded-xl border border-emerald-200/70 dark:border-emerald-900/60">
+        {/* Título de sección + fecha */}
+        <div className="min-w-0 hidden md:block">
+          <p className="text-[15px] font-semibold text-slate-900 dark:text-slate-50 leading-tight truncate">{TAB_TITLES[activeTab] || 'PsicoPlus'}</p>
+          <p className="text-[12px] text-slate-500 leading-tight mt-0.5 first-letter:uppercase">
+            {dateLabel} · <span className="font-mono normal-case">{time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
+          </p>
+        </div>
+
+        {/* Selector de sede */}
+        <div className="flex-1 flex justify-center md:justify-start md:pl-4 min-w-0">
+          {/* Segmentado (pantallas grandes) */}
+          <div role="radiogroup" aria-label="Sede" className="hidden 2xl:flex items-center p-0.5 rounded-lg bg-slate-900/[0.045] dark:bg-white/[0.05]">
             <button
+              role="radio"
+              aria-checked={selectedSedeId === 'all'}
               onClick={() => onSelectSede('all')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`h-8 px-3 inline-flex items-center gap-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
                 selectedSedeId === 'all'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs border border-emerald-200/80 dark:border-emerald-800 font-bold'
-                  : 'text-emerald-700/60 dark:text-emerald-400/60 hover:text-emerald-900 dark:hover:text-emerald-100'
+                  ? 'bg-[var(--bg-card)] text-slate-900 dark:text-slate-50 shadow-[0_1px_2px_rgba(27,29,26,0.08)]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <CalendarDays size={13} />
-              <span>Todas las Sedes</span>
+              <Layers size={14} className="opacity-70" /> Todas las sedes
             </button>
-
             {sedes.map((sede) => (
               <button
                 key={sede.id}
+                role="radio"
+                aria-checked={selectedSedeId === sede.id}
                 onClick={() => onSelectSede(sede.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`h-8 px-3 inline-flex items-center gap-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
                   selectedSedeId === sede.id
-                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs border border-emerald-200/80 dark:border-emerald-800 font-bold'
-                    : 'text-emerald-700/60 dark:text-emerald-400/60 hover:text-emerald-900 dark:hover:text-emerald-100'
+                    ? 'bg-[var(--bg-card)] text-slate-900 dark:text-slate-50 shadow-[0_1px_2px_rgba(27,29,26,0.08)]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                 }`}
               >
-                {getSedeIcon(sede.id)}
-                <span className="hidden lg:inline">{sede.nombre.split('-')[0].trim()}</span>
+                <span className="opacity-70">{getSedeIcon(sede.id)}</span>
+                {shortName(sede.nombre)}
               </button>
             ))}
           </div>
+
+          {/* Select (mobile / tablet) */}
+          <label className="2xl:hidden relative inline-flex items-center max-w-full">
+            <span className="sr-only">Sede</span>
+            <select
+              value={selectedSedeId}
+              onChange={(e) => onSelectSede(e.target.value)}
+              className="appearance-none h-9 pl-3 pr-8 max-w-[200px] truncate rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] text-[13px] font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:shadow-[var(--focus-ring)]"
+            >
+              <option value="all">Todas las sedes</option>
+              {sedes.map((s) => (
+                <option key={s.id} value={s.id}>{shortName(s.nombre)}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-2.5 pointer-events-none text-slate-500" />
+          </label>
         </div>
 
-        {/* Mobile Center: Dropdown */}
-        <div className="flex md:hidden items-center">
-          <select
-            value={selectedSedeId}
-            onChange={(e) => onSelectSede(e.target.value)}
-            className="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
-          >
-            <option value="all">📍 Todas las Sedes</option>
-            {sedes.map((s) => (
-              <option key={s.id} value={s.id}>{s.nombre.split('-')[0].trim()}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Right Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          
-          {/* Quick Search / Command Palette Trigger */}
+        {/* Acciones */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
           {onOpenSearch && (
             <button
               onClick={onOpenSearch}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg text-xs border border-slate-200 dark:border-slate-700 transition-all"
               title="Buscar (Ctrl + K)"
+              className="h-9 inline-flex items-center gap-2 pl-2.5 pr-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300 transition-colors"
             >
-              <Search size={13} />
-              <span className="hidden sm:inline font-medium">Buscar</span>
-              <kbd className="hidden md:inline-block px-1.5 py-0.2 text-[10px] font-mono text-slate-400 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700">
-                ⌘K
-              </kbd>
+              <Search size={15} />
+              <span className="hidden xl:inline text-[13px] pr-6">Buscar paciente, turno…</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-px text-[10.5px] font-mono text-slate-500 rounded border border-[var(--border-color)] bg-[var(--bg-app)]">⌘K</kbd>
             </button>
           )}
 
-          {/* Upgrade / Pro Badge Trigger */}
-          {!isPro ? (
-            <button
-              onClick={onOpenUpgradeModal}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition-all animate-pulse"
-              title="Actualizar a PsicoPlus PRO"
-            >
-              <Sparkles size={13} className="text-amber-200" />
-              <span>Pasar a PRO</span>
-            </button>
-          ) : (
-            <button
-              onClick={onOpenUpgradeModal}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition-all hover:bg-emerald-900/60"
-              title="Ver estado de suscripción PRO"
-            >
-              <ProBadge text="PRO ACTIVO" size="xs" />
-            </button>
-          )}
-
-          {/* Quick Portal link */}
-          {onNavigatePortal && (
-            <button
+          {turnosWebPendientesCount > 0 && onNavigatePortal && (
+            <IconButton
               onClick={onNavigatePortal}
-              title="Abrir Portal de Reservas Online"
-              className="hidden sm:flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-emerald-100/70 transition-all"
+              title={`${turnosWebPendientesCount} solicitudes de turno web`}
+              className="hidden sm:inline-flex relative"
             >
-              <Globe size={13} className="text-emerald-600 dark:text-emerald-400" />
-              <span>Portal</span>
-            </button>
+              <Globe size={17} />
+              <span className="absolute top-1 right-1 min-w-4 h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-semibold grid place-items-center">
+                {turnosWebPendientesCount}
+              </span>
+            </IconButton>
           )}
 
-          {/* Privacy Mode */}
-          <button
-            onClick={onTogglePrivacyMode}
-            title={privacyMode ? "Desactivar Modo Privacidad" : "Activar Modo Privacidad"}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-              privacyMode 
-                ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {privacyMode ? <EyeOff size={13} /> : <Eye size={13} />}
-            <span className="hidden lg:inline">
-              {privacyMode ? 'Privacidad Activa' : 'Modo Privado'}
-            </span>
-          </button>
-
-          {/* O.S. Alerts */}
           {pacientesEnAlertaCount > 0 && (
             <button
               onClick={onNavigateAlerts}
               title={`${pacientesEnAlertaCount} pacientes con órdenes por agotar`}
-              className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-amber-100/70 transition-all"
+              className="h-9 inline-flex items-center gap-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/25 text-[13px] font-medium hover:bg-amber-100 dark:hover:bg-amber-500/15 transition-colors"
             >
-              <ShieldAlert size={13} className="text-amber-600 dark:text-amber-400" />
-              <span className="hidden sm:inline">{pacientesEnAlertaCount} O.S.</span>
-              <span className="sm:hidden">{pacientesEnAlertaCount}</span>
+              <ShieldAlert size={15} />
+              <span className="font-mono">{pacientesEnAlertaCount}</span>
+              <span className="hidden xl:inline">órdenes por renovar</span>
             </button>
           )}
 
-          {/* Clock */}
-          <div className="hidden xl:flex items-center text-xs font-mono font-medium text-emerald-700/70 dark:text-emerald-400/70 bg-emerald-50/80 dark:bg-emerald-950/40 px-2.5 py-1.5 rounded-lg border border-emerald-200/60 dark:border-emerald-900/60">
-            {time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-          </div>
+          <IconButton
+            onClick={onTogglePrivacyMode}
+            title={privacyMode ? 'Desactivar modo privacidad' : 'Activar modo privacidad (oculta datos sensibles)'}
+            aria-pressed={privacyMode}
+            className={privacyMode ? '!bg-slate-900 !text-[#f4f1e8] dark:!bg-slate-100 dark:!text-slate-900' : ''}
+          >
+            {privacyMode ? <EyeOff size={17} /> : <Eye size={17} />}
+            <span className="hidden 2xl:inline text-[13px] font-medium">{privacyMode ? 'Privado' : 'Privacidad'}</span>
+          </IconButton>
 
-          {onSignOut && (
-            <button
-              onClick={onSignOut}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-200 hover:text-rose-600 transition-all"
-              title="Cerrar sesión"
+          {onToggleDarkMode && (
+            <IconButton
+              onClick={onToggleDarkMode}
+              title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              aria-label={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
             >
-              Salir
-            </button>
+              {isDarkMode ? <Sun size={17} /> : <Moon size={17} />}
+            </IconButton>
           )}
 
+          {isPro && (
+            <span className="hidden sm:inline-flex h-6 items-center px-2 rounded-md text-[11px] font-semibold tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/25">
+              PRO
+            </span>
+          )}
         </div>
       </div>
     </header>
   );
 };
+
+export default Header;

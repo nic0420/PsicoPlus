@@ -72,7 +72,7 @@ export const LegalModal = ({
         className="fixed inset-0 bg-slate-950/80 backdrop-blur-md" 
       />
 
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-emerald-900/60 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto">
+      <div className="relative w-full max-w-4xl bg-slate-900 border border-emerald-900/60 rounded-3xl shadow-[var(--shadow-pop)] overflow-hidden flex flex-col max-h-[92vh] my-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-emerald-950 bg-[#08120d]">
@@ -81,9 +81,9 @@ export const LegalModal = ({
               <ShieldCheck size={22} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold font-display text-white flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-semibold font-display text-white flex items-center gap-2">
                 Centro Legal, Seguridad & Cumplimiento Normativo
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   Ley 25.326 & ARCA
                 </span>
               </h2>
@@ -107,7 +107,7 @@ export const LegalModal = ({
             onClick={() => setActiveTab('terminos')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
               activeTab === 'terminos'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
@@ -119,7 +119,7 @@ export const LegalModal = ({
             onClick={() => setActiveTab('privacidad')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
               activeTab === 'privacidad'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
@@ -131,7 +131,7 @@ export const LegalModal = ({
             onClick={() => setActiveTab('cookies')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
               activeTab === 'cookies'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
@@ -143,7 +143,7 @@ export const LegalModal = ({
             onClick={() => setActiveTab('salud-mental')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
               activeTab === 'salud-mental'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
@@ -155,7 +155,7 @@ export const LegalModal = ({
             onClick={() => setActiveTab('auditoria')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
               activeTab === 'auditoria'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
@@ -170,38 +170,38 @@ export const LegalModal = ({
           {/* TAB 1: Términos y Condiciones */}
           {activeTab === 'terminos' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-[#0b1612] border border-emerald-900/50">
-                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-900/50">
+                <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                   <FileText size={16} className="text-emerald-400" />
                   Términos y Condiciones Generales de Uso de PsicoPlus
                 </h3>
-                <p className="text-[11px] text-emerald-200/70">
+                <p className="text-[12px] text-emerald-200/70">
                   Última actualización: Septiembre de 2026 • Válido para la República Argentina y uso internacional.
                 </p>
               </div>
 
               <div className="space-y-3 text-slate-300">
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">1. Aceptación y Objeto</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">1. Aceptación y Objeto</h4>
                 <p>
                   El acceso y utilización de la plataforma <strong>PsicoPlus</strong> (en adelante, "el Software" o "el Servicio") implica la aceptación plena y sin reservas de los presentes Términos y Condiciones. PsicoPlus es un software como servicio (SaaS) y herramienta tecnológica auxiliar diseñada específicamente para profesionales habilitados en Psicología, Psiquiatría y disciplinas afines de la salud mental.
                 </p>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">2. Responsabilidad Profesional y Matrícula Habilitante</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">2. Responsabilidad Profesional y Matrícula Habilitante</h4>
                 <p>
                   El usuario profesional declara bajo juramento estar debidamente matriculado ante el Colegio de Psicólogos o autoridad sanitaria competente de su jurisdicción provincial o nacional. La gestión clínica, el diagnóstico, las evoluciones terapéuticas, la prescripción y los actos profesionales son de exclusiva responsabilidad del profesional tratante, en concordancia con el Código de Ética de la Federación de Psicólogos de la República Argentina (FePRA).
                 </p>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">3. Facturación Electrónica e Integración con ARCA</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">3. Facturación Electrónica e Integración con ARCA</h4>
                 <p>
                   El módulo de facturación y comprobantes fiscales opera en estricta consonancia con las normativas vigentes emitidas por la <strong>Agencia de Recaudación y Control Aduanero (ARCA, ex-AFIP)</strong>, incluyendo la Resolución General AFIP 1415, 2485 y 4291/2018. El profesional es el único responsable de la veracidad de los datos fiscales, montos, alícuotas y declaraciones juradas emitidas bajo su CUIT/CUIL y Clave Fiscal.
                 </p>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">4. Portal de Turnos y Relación con Pacientes</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">4. Portal de Turnos y Relación con Pacientes</h4>
                 <p>
                   El portal de reserva de turnos para pacientes constituye un canal de comunicación directo entre el paciente y el consultorio. La confirmación o cancelación de turnos, así como la fijación de aranceles y coseguros de obras sociales o prepagas, son convenidas exclusivamente entre el paciente y el psicólogo.
                 </p>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">5. Propiedad Intelectual y Disponibilidad del Servicio</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">5. Propiedad Intelectual y Disponibilidad del Servicio</h4>
                 <p>
                   Los algoritmos, interfaz, diseño y arquitectura de PsicoPlus son propiedad intelectual protegida por la Ley 11.723 de Propiedad Intelectual. PsicoPlus no reclama propiedad alguna sobre las historias clínicas ni los datos ingresados por los profesionales, garantizando el derecho permanente de exportación y respaldo de la información.
                 </p>
@@ -212,18 +212,18 @@ export const LegalModal = ({
           {/* TAB 2: Política de Privacidad */}
           {activeTab === 'privacidad' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-[#0b1612] border border-emerald-900/50">
-                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-900/50">
+                <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                   <Lock size={16} className="text-emerald-400" />
                   Política de Privacidad y Protección de Datos Personales
                 </h3>
-                <p className="text-[11px] text-emerald-200/70">
+                <p className="text-[12px] text-emerald-200/70">
                   En cumplimiento riguroso de la Ley Nacional de Protección de Datos Personales N° 25.326 y estándares internacionales de confidencialidad médica.
                 </p>
               </div>
 
               <div className="space-y-3 text-slate-300">
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">1. Datos Sensibles y Salud Mental (Art. 2 y Art. 7 Ley 25.326)</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">1. Datos Sensibles y Salud Mental (Art. 2 y Art. 7 Ley 25.326)</h4>
                 <p>
                   Los datos vinculados a la salud mental, motivos de consulta, notas de evolución y diagnósticos tienen carácter de <strong>Datos Sensibles</strong> conforme al Artículo 2° de la Ley 25.326. PsicoPlus aplica medidas de seguridad de nivel médico:
                 </p>
@@ -233,17 +233,17 @@ export const LegalModal = ({
                   <li><strong>Modo Privacidad en Pantalla:</strong> Herramienta para ofuscar nombres y diagnósticos durante la atención presencial para evitar miradas indiscretas.</li>
                 </ul>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">2. Almacenamiento Seguro y Criptografía</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">2. Almacenamiento Seguro y Criptografía</h4>
                 <p>
                   Las contraseñas de acceso son protegidas con funciones criptográficas unidireccionales (SHA-256) con salado individual mediante la Web Crypto API del navegador. La información viaja encriptada bajo túneles TLS 1.3 con certificados SSL de alta seguridad.
                 </p>
 
-                <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">3. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)</h4>
+                <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">3. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)</h4>
                 <p>
                   En cumplimiento del Artículo 14 de la Ley 25.326, tanto los profesionales como los pacientes (a través de sus terapeutas) tienen derecho a solicitar el acceso gratuito a sus datos, así como su rectificación, actualización o supresión en cualquier momento mediante la función de exportación de backups o contactando al soporte técnico.
                 </p>
 
-                <div className="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/60 text-[11px] text-emerald-200">
+                <div className="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/60 text-[12px] text-emerald-200">
                   <strong>Órgano de Control en Argentina:</strong> La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.
                 </div>
               </div>
@@ -253,12 +253,12 @@ export const LegalModal = ({
           {/* TAB 3: Cookies & Almacenamiento */}
           {activeTab === 'cookies' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-[#0b1612] border border-emerald-900/50">
-                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-900/50">
+                <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                   <Cookie size={16} className="text-emerald-400" />
                   Política de Cookies y Almacenamiento Local (LocalStorage)
                 </h3>
-                <p className="text-[11px] text-emerald-200/70">
+                <p className="text-[12px] text-emerald-200/70">
                   Transparencia absoluta: conocé qué guardamos en tu navegador y personalizá tus opciones de privacidad.
                 </p>
               </div>
@@ -269,16 +269,16 @@ export const LegalModal = ({
 
               {/* Selector de Preferencias */}
               <div className="p-4 bg-slate-950 rounded-2xl border border-emerald-900/60 space-y-3">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Configuración de Preferencias</h4>
+                <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Configuración de Preferencias</h4>
                 
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
                         <span>Cookies & Storage Esenciales</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Obligatorias</span>
+                        <span className="text-[10.5px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Obligatorias</span>
                       </div>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[12px] text-slate-400">
                         Necesarias para autenticación, sesión del psicólogo, almacenamiento de turnos y seguridad contra ataques.
                       </p>
                     </div>
@@ -287,11 +287,11 @@ export const LegalModal = ({
 
                   <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
                         <span>Preferencias de Experiencia & Consultorio</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Recomendado</span>
+                        <span className="text-[10.5px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Recomendado</span>
                       </div>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[12px] text-slate-400">
                         Recuerda tu elección de Modo Oscuro, vista activa y configuración del Modo Privacidad para sala de espera.
                       </p>
                     </div>
@@ -305,11 +305,11 @@ export const LegalModal = ({
 
                   <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
                     <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
                         <span>Telemetría de Rendimiento Anónima</span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">Opcional</span>
+                        <span className="text-[10.5px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">Opcional</span>
                       </div>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[12px] text-slate-400">
                         Métricas agregadas sobre velocidad de carga de la agenda y reportes de errores sin datos personales.
                       </p>
                     </div>
@@ -325,7 +325,7 @@ export const LegalModal = ({
                 <div className="pt-2 flex justify-end">
                   <button
                     onClick={handleSaveCookiePrefs}
-                    className="btn btn-primary text-xs py-2 px-4 font-bold flex items-center gap-1.5"
+                    className="btn btn-primary text-xs py-2 px-4 font-semibold flex items-center gap-1.5"
                   >
                     <Check size={14} />
                     <span>Guardar Preferencias de Privacidad</span>
@@ -338,53 +338,53 @@ export const LegalModal = ({
           {/* TAB 4: Marco Legal Salud Mental & Obras Sociales */}
           {activeTab === 'salud-mental' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-[#0b1612] border border-emerald-900/50">
-                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-900/50">
+                <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                   <Scale size={16} className="text-emerald-400" />
                   Marco Normativo en Salud Mental, Obras Sociales y ARCA
                 </h3>
-                <p className="text-[11px] text-emerald-200/70">
+                <p className="text-[12px] text-emerald-200/70">
                   Regulaciones sanitarias y fiscales que amparan el ejercicio profesional y la facturación en Argentina.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <div className="p-4 rounded-2xl bg-slate-950/60 border border-emerald-900/40 space-y-2">
-                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                  <h4 className="text-xs font-semibold text-white flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     Ley Nacional de Salud Mental N° 26.657
                   </h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[12px] text-slate-400 leading-relaxed">
                     Garantiza el derecho a la protección de la salud mental de todas las personas y el pleno goce de los derechos humanos. PsicoPlus preserva la autonomía del paciente y promueve la confidencialidad de la atención interdisciplinaria.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950/60 border border-emerald-900/40 space-y-2">
-                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                  <h4 className="text-xs font-semibold text-white flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     Ley de Derechos del Paciente N° 26.529
                   </h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[12px] text-slate-400 leading-relaxed">
                     Establece los principios de autonomía de la voluntad, información sanitaria, consentimiento informado e historia clínica digital única e inalterable bajo custodia profesional.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950/60 border border-emerald-900/40 space-y-2">
-                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                  <h4 className="text-xs font-semibold text-white flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     Leyes de Obras Sociales (23.660 y 23.661)
                   </h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[12px] text-slate-400 leading-relaxed">
                     Regulan los convenios de cobertura médico-asistencial, aranceles, plazos de liquidación de prestaciones y reintegros con número de afiliado y código de prestación nomenclada (ej: 33.01.01).
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950/60 border border-emerald-900/40 space-y-2">
-                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                  <h4 className="text-xs font-semibold text-white flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     Resolución General ARCA 4291/2018 (ex-AFIP)
                   </h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-[12px] text-slate-400 leading-relaxed">
                     Establece el régimen de emisión de comprobantes electrónicos con Código de Autorización Electrónico (CAE), Código QR bidimensional obligatorio y fechas de prestación de servicios para reintegros legales.
                   </p>
                 </div>
@@ -395,13 +395,13 @@ export const LegalModal = ({
           {/* TAB 5: Auditoría de Seguridad en Vivo */}
           {activeTab === 'auditoria' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-[#0b1612] border border-emerald-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
                     <Activity size={16} className="text-emerald-400" />
                     Diagnóstico y Auditoría de Seguridad en Vivo
                   </h3>
-                  <p className="text-[11px] text-emerald-200/70">
+                  <p className="text-[12px] text-emerald-200/70">
                     Escaneo automatizado de vulnerabilidades, cabeceras HTTP, cifrado y secreto médico.
                   </p>
                 </div>
@@ -419,16 +419,16 @@ export const LegalModal = ({
               {auditData && (
                 <div className="space-y-4">
                   {/* Score Card */}
-                  <div className="p-4.5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/80 border border-emerald-500/30 flex items-center justify-between">
+                  <div className="p-4.5 rounded-2xl bg-slate-900 border border-emerald-500/30 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Puntaje Global de Seguridad</span>
-                      <h4 className="text-2xl sm:text-3xl font-extrabold text-white font-display mt-0.5">
+                      <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider block">Puntaje Global de Seguridad</span>
+                      <h4 className="text-2xl sm:text-3xl font-semibold text-white font-display mt-0.5">
                         {auditData.score} / 100
                       </h4>
                       <p className="text-xs text-emerald-300 font-semibold">{auditData.nivel}</p>
                     </div>
                     
-                    <div className="text-right text-[11px] text-slate-400 hidden sm:block">
+                    <div className="text-right text-[12px] text-slate-400 hidden sm:block">
                       <p>Motor: {auditData.auditor}</p>
                       <p>Fecha: {auditData.fechaAuditoria}</p>
                     </div>
@@ -448,12 +448,12 @@ export const LegalModal = ({
                         </div>
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-                            <span className="font-bold text-white text-xs">{item.nombre}</span>
-                            <span className="text-[10px] font-mono text-emerald-400/80 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-900">
+                            <span className="font-semibold text-white text-xs">{item.nombre}</span>
+                            <span className="text-[11px] font-mono text-emerald-400/80 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-900">
                               {item.normativa}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-400">{item.descripcion}</p>
+                          <p className="text-[12px] text-slate-400">{item.descripcion}</p>
                         </div>
                       </div>
                     ))}
@@ -467,12 +467,12 @@ export const LegalModal = ({
 
         {/* Footer */}
         <div className="px-5 sm:px-6 py-3.5 border-t border-emerald-950 bg-[#08120d] flex items-center justify-between">
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[12px] text-slate-400">
             PsicoPlus • Software de Gestión Médica & Psicológica Segura
           </div>
           <button
             onClick={onClose}
-            className="btn btn-primary text-xs py-1.5 px-4 font-bold"
+            className="btn btn-primary text-xs py-1.5 px-4 font-semibold"
           >
             Entendido y Aceptar
           </button>

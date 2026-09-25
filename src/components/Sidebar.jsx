@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -6,18 +6,19 @@ import {
   FileText,
   Wallet,
   Settings,
-  HeartPulse,
-  Award,
   Receipt,
   Globe,
   X,
   Sparkles,
-  Zap,
   LogOut,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  PanelLeftClose,
+  PanelLeftOpen,
+  BadgeCheck,
 } from 'lucide-react';
 import { ProBadge } from './Common/ProBadge';
+import { BrandMark, BrandWordmark } from './Common/BrandMark';
 import { PLANS, PLAN_LIMITS } from '../services/subscription';
 
 export const Sidebar = ({
@@ -34,203 +35,243 @@ export const Sidebar = ({
   onLogout,
   onOpenLegal
 }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const isPro = subscription.plan === PLANS.PRO;
-  const maxFreePatients = PLAN_LIMITS[PLANS.FREE].maxPacientes;
+  const maxFreePatients = PLAN_LIMITS[PLANS.FREE]?.maxPacientes || 15;
+  const usagePct = Math.min((pacientesCount / maxFreePatients) * 100, 100);
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'agenda', label: 'Agenda Multisede', icon: CalendarDays },
-    { id: 'pacientes', label: 'Pacientes & Clínicas', icon: Users },
-    { id: 'facturas', label: 'Facturación & Recibos', icon: Receipt },
-    { id: 'liquidaciones', label: 'Obras Sociales & Liq.', icon: FileText },
-    { id: 'finanzas', label: 'Finanzas & Caja', icon: Wallet },
-    { id: 'portal-pacientes', label: 'Portal Pacientes Web', icon: Globe, badge: turnosWebPendientesCount },
-    { id: 'configuracion', label: 'Configuración & Plan', icon: Settings },
+  const groups = [
+    {
+      title: 'Clínica',
+      items: [
+        { id: 'dashboard', label: 'Consultorio en Vivo', icon: LayoutDashboard },
+        { id: 'agenda', label: 'Agenda', icon: CalendarDays },
+        { id: 'pacientes', label: 'Pacientes', icon: Users },
+        { id: 'portal-pacientes', label: 'Portal Pacientes', icon: Globe, badge: turnosWebPendientesCount },
+      ],
+    },
+    {
+      title: 'Administración',
+      items: [
+        { id: 'facturas', label: 'Facturación ARCA', icon: Receipt },
+        { id: 'liquidaciones', label: 'Obras Sociales', icon: FileText },
+        { id: 'finanzas', label: 'Finanzas', icon: Wallet },
+      ],
+    },
   ];
+
+  const settingsItem = { id: 'configuracion', label: 'Configuración', icon: Settings };
 
   const handleItemClick = (id) => {
     onTabChange(id);
     if (onCloseMobile) onCloseMobile();
   };
 
-  const sidebarContent = (
-    <div className="w-64 bg-[#0b1612] text-emerald-100/90 min-h-screen flex flex-col justify-between border-r border-emerald-900/80 select-none pb-safe shadow-xl relative">
-      
-      {/* Brand & Header */}
-      <div>
-        <div className="p-4 sm:p-5 border-b border-emerald-900/80 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-emerald-600/20">
-              <HeartPulse size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-lg font-bold tracking-tight text-white font-display">PsicoPlus</h1>
-                {isPro ? (
-                  <ProBadge text="PRO" size="xs" />
-                ) : (
-                  <span className="text-[9px] uppercase font-bold bg-slate-800 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.2 rounded">FREE</span>
-                )}
-              </div>
-              <p className="text-[11px] text-emerald-400/70 font-medium">Gestión Clínica & Sedes</p>
-            </div>
-          </div>
+  const initials = config?.nombre
+    ? config.nombre.replace(/Lic\.\s*/i, '').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+    : 'VT';
 
-          {/* Mobile close button */}
-          {onCloseMobile && (
-            <button
-              onClick={onCloseMobile}
-              className="md:hidden p-1.5 rounded-lg text-emerald-400/70 hover:text-white hover:bg-emerald-900/60 transition-colors"
-            >
-              <X size={18} />
-            </button>
+  const renderNavItem = (item) => {
+    const Icon = item.icon;
+    const isActive = activeTab === item.id;
+    return (
+      <button
+        key={item.id}
+        onClick={() => handleItemClick(item.id)}
+        title={isCollapsed ? item.label : undefined}
+        aria-current={isActive ? 'page' : undefined}
+        className={`group relative flex items-center rounded-lg text-left transition-colors duration-150 ${
+          isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full gap-3 px-2.5 h-9'
+        } ${
+          isActive
+            ? 'bg-[var(--bg-card)] text-slate-900 dark:text-slate-50 shadow-[0_1px_2px_rgba(27,29,26,0.06),0_0_0_1px_var(--border-color)]'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04]'
+        }`}
+      >
+        {isActive && !isCollapsed && (
+          <span className="absolute -left-3 top-2 bottom-2 w-[3px] rounded-r-full bg-emerald-600 dark:bg-emerald-300" />
+        )}
+        <Icon
+          size={17}
+          strokeWidth={isActive ? 2.1 : 1.8}
+          className={isActive ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}
+        />
+        {!isCollapsed && <span className="text-[13.5px] font-medium tracking-[-0.005em]">{item.label}</span>}
+        {item.badge > 0 && (
+          <span
+            className={`${isCollapsed ? 'absolute top-1 right-1 w-2 h-2 p-0' : 'ml-auto min-w-5 h-5 px-1.5'} grid place-items-center rounded-full bg-rose-500 text-white text-[10.5px] font-semibold`}
+          >
+            {!isCollapsed && item.badge}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const sidebarContent = (
+    <div
+      className={`${isCollapsed ? 'w-[72px]' : 'w-[248px]'} h-full min-h-screen bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] flex flex-col select-none pb-safe transition-[width] duration-200 ease-out`}
+    >
+      {/* Marca */}
+      <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-4'}`}>
+        <div className="flex items-center gap-2.5">
+          <BrandMark size={32} />
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <BrandWordmark className="text-slate-900 dark:text-slate-50" />
+              {isPro ? (
+                <ProBadge text="PRO" size="xs" />
+              ) : (
+                <span className="text-[10px] font-medium text-slate-500 border border-[var(--border-color)] px-1.5 py-px rounded-md">Free</span>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Navigation Items */}
-        <nav className="p-3 space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left relative ${
-                  isActive
-                    ? 'bg-emerald-700 text-white shadow-sm shadow-emerald-700/30'
-                    : 'text-emerald-400/70 hover:text-emerald-200 hover:bg-emerald-900/40'
-                }`}
-              >
-                <Icon size={17} className={isActive ? 'text-white' : 'text-emerald-400/60'} />
-                <span className="tracking-normal text-[13px]">{item.label}</span>
-
-                {/* Badge for portal requests */}
-                {item.badge > 0 && (
-                  <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        {!isCollapsed && onCloseMobile && isMobileOpen && (
+          <button
+            onClick={onCloseMobile}
+            aria-label="Cerrar menú"
+            className="md:hidden w-9 h-9 grid place-items-center rounded-lg text-slate-500 hover:bg-slate-900/5"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
-      {/* Plan Status & Professional Card */}
-      <div className="p-3 space-y-2.5">
-        
-        {/* Freemium Upgrade Card */}
+      {/* Navegación */}
+      <nav className={`flex-1 overflow-y-auto ${isCollapsed ? 'px-2' : 'px-3'} pt-2 space-y-6`} aria-label="Principal">
+        {groups.map((group) => (
+          <div key={group.title} className="space-y-0.5">
+            {!isCollapsed ? (
+              <p className="px-2.5 pb-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-500">{group.title}</p>
+            ) : (
+              <div className="mx-auto mb-2 w-5 h-px bg-[var(--border-color)]" />
+            )}
+            {group.items.map((item) => renderNavItem(item))}
+          </div>
+        ))}
+        <div className="space-y-0.5">
+          {isCollapsed && <div className="mx-auto mb-2 w-5 h-px bg-[var(--border-color)]" />}
+          {renderNavItem(settingsItem)}
+        </div>
+      </nav>
+
+      {/* Pie: plan, enlaces y perfil */}
+      <div className={`${isCollapsed ? 'px-2' : 'px-3'} pb-3 pt-3 space-y-2`}>
         {!isPro ? (
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-500/15 via-emerald-950/80 to-[#08100d] border border-amber-500/30 text-white">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">Plan Inicial Gratuito</span>
-              <span className="text-[10px] text-emerald-300 font-mono">{pacientesCount}/{maxFreePatients} pac.</span>
+          !isCollapsed ? (
+            <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-3">
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-[12.5px] font-medium text-slate-800 dark:text-slate-200">Plan inicial</span>
+                <span className="text-[11.5px] text-slate-500 font-mono">{pacientesCount}/{maxFreePatients} pacientes</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden mb-3" role="progressbar" aria-valuenow={Math.round(usagePct)} aria-valuemin={0} aria-valuemax={100}>
+                <div
+                  className={`h-full rounded-full transition-[width] duration-500 ${usagePct >= 80 ? 'bg-amber-500' : 'bg-emerald-600 dark:bg-emerald-400'}`}
+                  style={{ width: `${usagePct}%` }}
+                />
+              </div>
+              <button
+                onClick={onOpenUpgradeModal}
+                className="w-full h-8 rounded-lg bg-slate-900 text-[#f4f1e8] dark:bg-slate-100 dark:text-slate-900 text-[12.5px] font-medium flex items-center justify-center gap-1.5 hover:bg-slate-800 active:scale-[0.97] transition-[background-color,transform] duration-150"
+              >
+                <Sparkles size={13} />
+                Pasar a PRO
+              </button>
             </div>
-            {/* Progress bar */}
-            <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden mb-2.5">
-              <div 
-                className="h-full bg-gradient-to-r from-emerald-400 to-amber-400 rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min((pacientesCount / maxFreePatients) * 100, 100)}%` }}
-              />
-            </div>
+          ) : (
             <button
               onClick={onOpenUpgradeModal}
-              className="w-full py-2 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-extrabold text-[11px] rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+              title="Pasar a PRO"
+              className="w-10 h-10 mx-auto rounded-lg bg-slate-900 text-[#f4f1e8] dark:bg-slate-100 dark:text-slate-900 grid place-items-center active:scale-95 transition-transform"
             >
-              <Sparkles size={12} className="text-slate-950" />
-              <span>Desbloquear PRO</span>
+              <Sparkles size={16} />
             </button>
-          </div>
+          )
         ) : (
-          <div className="p-2.5 rounded-2xl bg-gradient-to-r from-emerald-950/80 to-slate-900 border border-emerald-500/40 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap size={14} className="text-amber-400 fill-amber-400" />
-              <div>
-                <span className="text-xs font-bold text-white block leading-none">PsicoPlus PRO</span>
-                <span className="text-[10px] text-emerald-400 font-medium">Ilimitado Activo</span>
-              </div>
+          !isCollapsed && (
+            <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center gap-2">
+              <BadgeCheck size={16} className="text-emerald-600 dark:text-emerald-300" />
+              <span className="text-[12.5px] font-medium">PsicoPlus PRO activo</span>
             </div>
-            <ProBadge text="ACTIVO" size="xs" />
+          )
+        )}
+
+        {!isCollapsed && (onOpenLanding || onOpenLegal) && (
+          <div className="flex flex-col">
+            {onOpenLanding && (
+              <button
+                onClick={onOpenLanding}
+                className="h-8 px-2.5 rounded-lg text-[12.5px] text-slate-600 dark:text-slate-400 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] hover:text-slate-900 flex items-center justify-between transition-colors"
+              >
+                <span>Ver sitio público</span>
+                <ExternalLink size={13} className="text-slate-400" />
+              </button>
+            )}
+            {onOpenLegal && (
+              <button
+                onClick={() => onOpenLegal('auditoria')}
+                className="h-8 px-2.5 rounded-lg text-[12.5px] text-slate-600 dark:text-slate-400 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] hover:text-slate-900 flex items-center justify-between transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  Seguridad · Ley 25.326
+                </span>
+              </button>
+            )}
           </div>
         )}
 
-        {/* Quick Landing View link */}
-        {onOpenLanding && (
-          <button
-            onClick={onOpenLanding}
-            className="w-full px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-900/40 text-[11px] font-semibold text-emerald-300 flex items-center justify-between transition-colors"
+        <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2' : 'gap-2.5 pt-2 border-t border-[var(--border-color)]'}`}>
+          <div
+            className="relative w-9 h-9 flex-shrink-0 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 grid place-items-center text-[12px] font-semibold"
+            title={config?.nombre || 'Lic. Profesional'}
           >
-            <span>Ver Landing Page Pública</span>
-            <ExternalLink size={12} />
-          </button>
-        )}
-
-        {/* Legal & Security Center button */}
-        {onOpenLegal && (
-          <button
-            onClick={() => onOpenLegal('auditoria')}
-            className="w-full px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-emerald-950/60 border border-emerald-900/50 text-[11px] font-semibold text-emerald-300 flex items-center justify-between transition-colors"
-          >
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck size={13} className="text-emerald-400" />
-              <span>Seguridad & Ley 25.326</span>
-            </span>
-            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded border border-emerald-500/30">
-              A+
-            </span>
-          </button>
-        )}
-
-        {/* Professional Profile Footer Card */}
-        <div className="p-3 rounded-2xl bg-emerald-950/50 border border-emerald-900/50 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold text-xs">
-                {config?.nombre ? config.nombre.replace(/Lic\.\s*/i, '').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'VT'}
-              </div>
-              <div className="w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0b1612] rounded-full absolute -bottom-0.5 -right-0.5" />
-            </div>
-            <div className="overflow-hidden min-w-0">
-              <h4 className="text-xs font-semibold text-emerald-100 truncate">{config.nombre || 'Lic. Virna Toledo'}</h4>
-              <div className="flex items-center gap-1 text-[10px] text-emerald-400/70 font-medium">
-                <Award size={11} className="text-amber-400 flex-shrink-0" />
-                <span className="truncate">{config.matriculaProvincial || 'M.P. 1842'}</span>
-              </div>
-            </div>
+            {initials}
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[var(--bg-sidebar)]" />
           </div>
-
-          {onLogout && (
+          {!isCollapsed && (
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-medium text-slate-900 dark:text-slate-100 truncate">{config?.nombre || 'Lic. Profesional'}</p>
+              <p className="text-[11.5px] text-slate-500 truncate">{config?.matriculaProvincial || 'M.P. 1842'}</p>
+            </div>
+          )}
+          {!isCollapsed && onLogout && (
             <button
               onClick={onLogout}
-              title="Cambiar cuenta / Salir"
-              className="p-1.5 text-emerald-400/60 hover:text-white hover:bg-emerald-900/60 rounded-lg transition-colors flex-shrink-0"
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+              className="w-8 h-8 grid place-items-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.05] dark:hover:text-slate-100 transition-colors"
             >
-              <LogOut size={14} />
+              <LogOut size={15} />
             </button>
           )}
         </div>
 
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`hidden md:flex items-center gap-2 h-8 rounded-lg text-[12px] text-slate-500 hover:text-slate-800 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] dark:hover:text-slate-200 transition-colors ${isCollapsed ? 'w-10 mx-auto justify-center' : 'w-full px-2.5'}`}
+          title={isCollapsed ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
+        >
+          {isCollapsed ? <PanelLeftOpen size={15} /> : <><PanelLeftClose size={15} /> Colapsar</>}
+        </button>
       </div>
-
     </div>
   );
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-shrink-0">
+      {/* Desktop */}
+      <aside className="hidden md:block flex-shrink-0 sticky top-0 h-screen">
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer */}
+      {/* Mobile drawer */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex animate-fade-in">
-          <div 
-            onClick={onCloseMobile}
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
-          />
-          <div className="relative z-10 shadow-2xl h-full overflow-y-auto">
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div onClick={onCloseMobile} className="fixed inset-0 bg-slate-950/40 backdrop-blur-[2px] animate-[backdropIn_.2s_ease-out]" />
+          <div className="relative z-10 h-full overflow-y-auto shadow-[var(--shadow-pop)] animate-[drawerIn_.28s_cubic-bezier(.23,1,.32,1)]">
             {sidebarContent}
           </div>
         </div>

@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { generarQrArcaDataUrl, generarCodigoBarrasFiscal } from './arcaService';
 
 export const generateConstanciaPDF = ({ paciente, turno, config, sede }) => {
   const doc = new jsPDF({
@@ -162,9 +163,7 @@ export const generatePlanillaLiquidacionPDF = ({ obraSocial, periodo, pacientes,
   doc.save(`Liquidacion_${obraSocial.sigla}_${periodo.replace(/\s+/g, '_')}.pdf`);
 };
 
-import { generarQrArcaDataUrl, generarCodigoBarrasFiscal } from './arcaService';
-
-export const generateFacturaPDF = async ({ factura, config, paciente, obraSocial }) => {
+export const generateFacturaPDF = async ({ factura = {}, config = {}, paciente = {}, obraSocial = {} }) => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -384,20 +383,24 @@ export const generateFacturaPDF = async ({ factura, config, paciente, obraSocial
   doc.line(14, caeY, 196, caeY);
 
   // Generar Código QR Oficial de ARCA
-  const qrDataUrl = await generarQrArcaDataUrl({
-    cuitEmisor: config.cuit,
-    puntoVenta: config.puntoVenta || 1,
-    tipoComprobante: isFacturaC ? 11 : isFacturaB ? 6 : 15,
-    numeroComprobante: factura.numeroFactura || 1,
-    importe: factura.total,
-    fechaEmision: factura.fechaEmision,
-    nroDocReceptor: factura.pacienteDni,
-    cae: factura.cae
-  });
+  try {
+    const qrDataUrl = await generarQrArcaDataUrl({
+      cuitEmisor: config?.cuit || '27-38452190-4',
+      puntoVenta: config?.puntoVenta || 1,
+      tipoComprobante: isFacturaC ? 11 : isFacturaB ? 6 : 15,
+      numeroComprobante: factura?.numeroFactura || 1,
+      importe: factura?.total || 0,
+      fechaEmision: factura?.fechaEmision,
+      nroDocReceptor: factura?.pacienteDni,
+      cae: factura?.cae
+    });
 
-  if (qrDataUrl) {
-    // Dibujar Código QR de ARCA (34x34 mm)
-    doc.addImage(qrDataUrl, 'PNG', 18, caeY + 4, 32, 32);
+    if (qrDataUrl) {
+      // Dibujar Código QR de ARCA (32x32 mm)
+      doc.addImage(qrDataUrl, 'PNG', 18, caeY + 4, 32, 32);
+    }
+  } catch (qrErr) {
+    console.warn('No se pudo estampar el código QR en el PDF:', qrErr);
   }
 
   // Texto Fiscal ARCA al lado del QR
@@ -414,7 +417,7 @@ export const generateFacturaPDF = async ({ factura, config, paciente, obraSocial
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
-  if (factura.cae) {
+  if (factura?.cae) {
     doc.text(`CAE Nº: ${factura.cae}`, 54, caeY + 24);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
@@ -432,33 +435,42 @@ export const generateFacturaPDF = async ({ factura, config, paciente, obraSocial
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(15, 23, 42);
-  doc.text(config.nombre || 'Lic. Virna Toledo', 164, caeY + 26, { align: 'center' });
+  doc.text(config?.nombre || 'Lic. Virna Toledo', 164, caeY + 26, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
-  doc.text(config.matriculaProvincial || 'M.P. 1842', 164, caeY + 30, { align: 'center' });
-  doc.text(config.colegio || 'Colegio de Psicólogos', 164, caeY + 34, { align: 'center' });
+  doc.text(config?.matriculaProvincial || 'M.P. 1842', 164, caeY + 30, { align: 'center' });
+  doc.text(config?.colegio || 'Colegio de Psicólogos', 164, caeY + 34, { align: 'center' });
 
   // Código de barras fiscal de 40 dígitos en la parte inferior
-  const codigoBarras = generarCodigoBarrasFiscal({
-    cuitEmisor: config.cuit,
-    tipoComprobante: isFacturaC ? 11 : isFacturaB ? 6 : 15,
-    puntoVenta: config.puntoVenta || 1,
-    cae: factura.cae,
-    fechaVencimientoCae: factura.vencimientoCae
-  });
+  let codigoBarras = '';
+  try {
+    codigoBarras = generarCodigoBarrasFiscal({
+      cuitEmisor: config?.cuit,
+      tipoComprobante: isFacturaC ? 11 : isFacturaB ? 6 : 15,
+      puntoVenta: config?.puntoVenta || 1,
+      cae: factura?.cae,
+      fechaVencimientoCae: factura?.vencimientoCae
+    });
+  } catch (barErr) {
+    console.warn('No se pudo generar código de barras fiscal:', barErr);
+  }
 
-  doc.setFont('courier', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(51, 65, 85);
-  doc.text(`||||| ||| |||| ||||| |||| ||| |||||   ${codigoBarras}`, 105, 274, { align: 'center' });
+  if (codigoBarras) {
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text(`||||| ||| |||| ||||| |||| ||| |||||   ${codigoBarras}`, 105, 274, { align: 'center' });
+  }
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(148, 163, 184);
   doc.text('Comprobante emitido con PsicoPlus PRO • Cumple RG 4291 ARCA (ex-AFIP) y Normativa de Salud Mental', 105, 279, { align: 'center' });
 
-  doc.save(`Factura_${(factura.numeroFactura || '0001').replace(/\s+/g, '_')}_${(factura.pacienteNombre || 'Paciente').replace(/\s+/g, '_')}.pdf`);
+  const safeNumero = String(factura?.numeroFactura || '0001').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safePaciente = String(factura?.pacienteNombre || 'Paciente').replace(/[^a-zA-Z0-9_-]/g, '_');
+  doc.save(`Factura_${safeNumero}_${safePaciente}.pdf`);
 };
 
 

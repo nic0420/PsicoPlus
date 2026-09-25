@@ -1,3 +1,4 @@
+import { BrandMark } from '../Common/BrandMark';
 import React, { useState } from 'react';
 import { 
   Calendar, 
@@ -13,7 +14,6 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Sparkles, 
-  HeartPulse, 
   Share2, 
   Copy, 
   MessageCircle, 
@@ -150,14 +150,14 @@ export const PortalTurnosView = ({
       {/* Admin Share & Solicitudes Banner */}
       {!isStandalone && (
         <div className="space-y-4">
-          <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="bg-slate-900 text-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                   <Sparkles size={11} className="text-amber-300" /> Portal Pacientes & Turnero Web
                 </span>
               </div>
-              <h3 className="text-lg font-bold font-display">Portal de Autogestión para Pacientes</h3>
+              <h3 className="text-lg font-semibold font-display">Portal de Autogestión para Pacientes</h3>
               <p className="text-xs text-slate-300 mt-0.5 max-w-xl">
                 Tus pacientes pueden ingresar desde su celular, elegir fecha y hora disponible, y solicitar turno directamente.
               </p>
@@ -188,14 +188,14 @@ export const PortalTurnosView = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <h4 className="text-xs font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                     <span>Solicitudes Web Pendientes</span>
-                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                    <span className="bg-emerald-600 text-white text-[11px] font-semibold px-1.5 py-0.2 rounded-full">
                       {solicitudesWebPendientes.length}
                     </span>
                   </h4>
                 </div>
-                <span className="text-[11px] text-slate-500">Revisá y confirmá los turnos pedidos online</span>
+                <span className="text-[12px] text-slate-500">Revisá y confirmá los turnos pedidos online</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -212,16 +212,16 @@ export const PortalTurnosView = ({
                     <div key={turno.id} className="card p-3 flex flex-col justify-between gap-2.5">
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <h5 className="font-bold text-xs text-slate-900 dark:text-white">{pacNombre}</h5>
-                          <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                          <h5 className="font-semibold text-xs text-slate-900 dark:text-white">{pacNombre}</h5>
+                          <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                             {turno.fecha} • {turno.horaInicio} hs
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-[12px] text-slate-500 mt-0.5">
                           <strong>Tel:</strong> {pacTel || '-'} • <strong>Cobertura:</strong> {pacOs}
                         </p>
                         {turno.notas && (
-                          <p className="text-[11px] text-slate-600 dark:text-slate-400 italic mt-1 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-lg">
+                          <p className="text-[12px] text-slate-600 dark:text-slate-400 italic mt-1 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-lg">
                             {turno.notas}
                           </p>
                         )}
@@ -278,41 +278,39 @@ export const PortalTurnosView = ({
       )}
 
       {/* Main Booking Container */}
-      <div className="card p-0 overflow-hidden shadow-lg">
+      <div className="bg-[var(--bg-card)] rounded-2xl overflow-hidden shadow-[var(--shadow-pop)] border border-[var(--border-color)] max-w-2xl mx-auto">
         
         {/* Portal Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-6 md:p-8 text-center relative overflow-hidden">
+        <div className="bg-emerald-900 text-white p-7 sm:p-9 text-center relative overflow-hidden">
           <div className="relative z-10 max-w-md mx-auto">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-600/30 border border-emerald-400/40 flex items-center justify-center text-emerald-300 mx-auto mb-2.5 shadow-sm">
-              <HeartPulse size={24} />
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold font-display tracking-tight text-white">
-              {config.nombre || 'Lic. Virna Toledo'}
+            <div className="flex justify-center mb-4"><BrandMark size={44} tone="light" /></div>
+            <h1 className="font-serif text-[2.1rem] md:text-[2.5rem] leading-tight text-white">
+              {config.nombre || 'Lic. Profesional'}
             </h1>
 
-            <p className="text-slate-300 text-xs font-medium mt-0.5">
+            <p className="text-emerald-200 text-[13px] font-medium mt-1">
               {config.titulo || 'Licenciada en Psicología'} • {config.matriculaProvincial || 'M.P. 1842'}
             </p>
-            <p className="text-slate-400 text-[11px] mt-1.5 max-w-sm mx-auto">
+            <p className="text-emerald-100/80 text-[14px] mt-3 max-w-sm mx-auto leading-relaxed">
               {config.portalMensajeBienvenida || 'Solicitá tu turno en simples pasos. Seleccioná modalidad, fecha y completá tus datos.'}
             </p>
           </div>
 
           {/* Stepper Progress */}
           {step < 4 && (
-            <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-slate-800 max-w-xs mx-auto">
+            <div className="flex items-center justify-center gap-2 mt-6 pt-5 border-t border-white/10 max-w-xs mx-auto">
               {[1, 2, 3].map((num) => (
                 <div key={num} className="flex items-center gap-2">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                     step === num 
-                      ? 'bg-emerald-600 text-white shadow-sm font-bold' 
+                      ? 'bg-[#f4f1e8] text-emerald-900' 
                       : step > num 
-                      ? 'bg-emerald-500 text-white' 
-                      : 'bg-slate-800 text-slate-400'
+                      ? 'bg-emerald-400 text-emerald-950' 
+                      : 'border border-white/25 text-emerald-100/70'
                   }`}>
                     {step > num ? '✓' : num}
                   </div>
-                  {num < 3 && <div className={`w-6 h-0.5 ${step > num ? 'bg-emerald-500' : 'bg-slate-800'}`} />}
+                  {num < 3 && <div className={`w-8 h-0.5 rounded-full ${step > num ? 'bg-emerald-300' : 'bg-white/20'}`} />}
                 </div>
               ))}
             </div>
@@ -320,13 +318,13 @@ export const PortalTurnosView = ({
         </div>
 
         {/* Form Body Steps */}
-        <div className="p-5 sm:p-6 md:p-8">
+        <div className="p-6 sm:p-8">
           
           {/* STEP 1: Modalidad y Sede */}
           {step === 1 && (
             <div className="space-y-5">
               <div className="text-center max-w-md mx-auto mb-4">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Paso 1: Elegí la Modalidad de Atención</h2>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">Paso 1: Elegí la Modalidad de Atención</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Podés atenderte presencialmente en Corrientes o de forma 100% online.
                 </p>
@@ -346,7 +344,7 @@ export const PortalTurnosView = ({
                       }`}
                     >
                       {isSelected && (
-                        <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px] font-bold">
+                        <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10.5px] font-semibold">
                           ✓
                         </div>
                       )}
@@ -354,10 +352,10 @@ export const PortalTurnosView = ({
                         <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 w-fit mb-2.5">
                           {getSedeIcon(sede.id)}
                         </div>
-                        <h4 className="font-bold text-xs text-slate-900 dark:text-white">{sede.nombre}</h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">{sede.direccion}</p>
+                        <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{sede.nombre}</h4>
+                        <p className="text-[12px] text-slate-500 mt-0.5">{sede.direccion}</p>
                       </div>
-                      <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                         {sede.diasAtencion}
                       </div>
                     </div>
@@ -369,7 +367,7 @@ export const PortalTurnosView = ({
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="btn btn-primary text-xs py-2 px-5 font-bold"
+                  className="btn btn-primary text-xs py-2 px-5 font-semibold"
                 >
                   <span>Continuar a Selección de Horario</span>
                   <ChevronRight size={14} />
@@ -382,9 +380,9 @@ export const PortalTurnosView = ({
           {step === 2 && (
             <div className="space-y-5">
               <div className="text-center max-w-md mx-auto mb-4">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Paso 2: Seleccioná Día y Horario</h2>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">Paso 2: Seleccioná Día y Horario</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Sede seleccionada: <span className="font-bold text-emerald-600 dark:text-emerald-400">{selectedSede.nombre}</span>
+                  Sede seleccionada: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{selectedSede.nombre}</span>
                 </p>
               </div>
 
@@ -405,7 +403,7 @@ export const PortalTurnosView = ({
                     }}
                     className="input-field text-xs font-semibold"
                   />
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[12px] text-slate-500">
                     Atención sujeta a disponibilidad según el cronograma de la sede.
                   </p>
                 </div>
@@ -431,7 +429,7 @@ export const PortalTurnosView = ({
                             occupied
                               ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed line-through'
                               : isSelected
-                              ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                              ? 'bg-emerald-600 text-white font-semibold shadow-xs'
                               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700'
                           }`}
                         >
@@ -442,7 +440,7 @@ export const PortalTurnosView = ({
                   </div>
 
                   {selectedHora && (
-                    <div className="text-center pt-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 py-1 rounded-lg">
+                    <div className="text-center pt-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 py-1 rounded-lg">
                       Turno seleccionado: {selectedFecha} a las {selectedHora} hs
                     </div>
                   )}
@@ -464,7 +462,7 @@ export const PortalTurnosView = ({
                   type="button"
                   disabled={!selectedHora}
                   onClick={() => setStep(3)}
-                  className={`btn ${selectedHora ? 'btn-primary' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} text-xs font-bold`}
+                  className={`btn ${selectedHora ? 'btn-primary' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} text-xs font-semibold`}
                 >
                   <span>Continuar a Mis Datos</span>
                   <ChevronRight size={14} />
@@ -477,7 +475,7 @@ export const PortalTurnosView = ({
           {step === 3 && (
             <form onSubmit={handleCompleteBooking} className="space-y-4 text-xs">
               <div className="text-center max-w-md mx-auto mb-4">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Paso 3: Tus Datos de Contacto</h2>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">Paso 3: Tus Datos de Contacto</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Completá tus datos para que podamos registrar tu turno y contactarte.
                 </p>
@@ -487,11 +485,11 @@ export const PortalTurnosView = ({
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl border border-emerald-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span className="text-slate-500">Modalidad: </span>
-                  <span className="font-bold text-emerald-900 dark:text-emerald-200">{selectedSede.nombre}</span>
+                  <span className="font-semibold text-emerald-900 dark:text-emerald-200">{selectedSede.nombre}</span>
                 </div>
                 <div>
                   <span className="text-slate-500">Horario: </span>
-                  <span className="font-bold text-emerald-900 dark:text-emerald-200">{selectedFecha} a las {selectedHora} hs</span>
+                  <span className="font-semibold text-emerald-900 dark:text-emerald-200">{selectedFecha} a las {selectedHora} hs</span>
                 </div>
               </div>
 
@@ -608,7 +606,7 @@ export const PortalTurnosView = ({
 
                 <button
                   type="submit"
-                  className="btn btn-primary text-xs font-bold"
+                  className="btn btn-primary text-xs font-semibold"
                 >
                   <CheckCircle2 size={14} />
                   <span>Confirmar y Solicitar Turno</span>
@@ -626,7 +624,7 @@ export const PortalTurnosView = ({
               </div>
 
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display">
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white font-display">
                   ¡Turno Solicitado con Éxito!
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -637,27 +635,27 @@ export const PortalTurnosView = ({
               {/* Receipt Card */}
               <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-left space-y-2">
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Resumen de Turno</span>
-                  <span className="badge bg-amber-50 text-amber-700 border border-amber-200 text-[10px]">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Resumen de Turno</span>
+                  <span className="badge bg-amber-50 text-amber-700 border border-amber-200 text-[11px]">
                     Pendiente de Aprobación
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <span className="text-slate-400 text-[10px] block">Paciente</span>
+                    <span className="text-slate-400 text-[11px] block">Paciente</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">{confirmedTurno.pacienteNombre}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] block">DNI</span>
+                    <span className="text-slate-400 text-[11px] block">DNI</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">{confirmedTurno.pacienteDni}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] block">Fecha y Hora</span>
+                    <span className="text-slate-400 text-[11px] block">Fecha y Hora</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">{confirmedTurno.fecha} - {confirmedTurno.horaInicio} hs</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] block">Modalidad / Sede</span>
+                    <span className="text-slate-400 text-[11px] block">Modalidad / Sede</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedSede.nombre}</span>
                   </div>
                 </div>
@@ -672,7 +670,7 @@ export const PortalTurnosView = ({
                     const url = generateWhatsappLink(profTel, msg);
                     window.open(url, '_blank');
                   }}
-                  className="w-full btn btn-whatsapp text-xs py-2.5 font-bold"
+                  className="w-full btn btn-whatsapp text-xs py-2.5 font-semibold"
                 >
                   <MessageCircle size={15} />
                   <span>Avisar a la Psicóloga por WhatsApp</span>

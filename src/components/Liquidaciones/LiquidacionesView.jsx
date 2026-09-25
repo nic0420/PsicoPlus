@@ -87,18 +87,23 @@ export const LiquidacionesView = ({
     <div className="space-y-5 animate-fade-in">
       
       {/* Header Liquidaciones */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
-            <FileSpreadsheet size={24} className="text-emerald-600 dark:text-emerald-400" />
-            Obras Sociales & Planillas de Liquidación
+          <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[13px] font-medium text-emerald-700 dark:text-emerald-300">Convenios & Liquidación</span>
+          </div>
+          <h2 className="font-serif text-[2.1rem] sm:text-[2.6rem] leading-[1.04] text-slate-900 dark:text-slate-50 flex items-center gap-2.5">
+            <div className="hidden" aria-hidden="true">
+              <FileSpreadsheet size={18} />
+            </div>
+            <span>Obras Sociales & Liquidaciones</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-2 max-w-2xl">
             Generación de planillas mensuales para presentar al Colegio de Psicólogos de Corrientes o mutuales.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-2.5 self-start md:self-auto">
           <button 
             onClick={() => {
               const isPro = subscription?.plan === 'pro';
@@ -126,7 +131,7 @@ export const LiquidacionesView = ({
                 }
               });
             }}
-            className="btn btn-secondary text-xs flex items-center gap-1.5"
+            className="btn btn-secondary text-xs flex items-center gap-1.5 shadow-xs"
             title="Generar liquidación de todas las obras sociales en 1 clic"
           >
             <span>Liquidación Masiva</span>
@@ -135,7 +140,7 @@ export const LiquidacionesView = ({
 
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="btn btn-primary text-xs"
+            className="btn btn-primary text-xs shadow-sm"
           >
             <Plus size={15} />
             <span>Generar Planilla</span>
@@ -144,43 +149,43 @@ export const LiquidacionesView = ({
       </div>
 
       {/* 3 Cards de Estado Financiero de Obras Sociales */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
-        <div className="card p-4.5 flex items-center justify-between card-glow-amber">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">En Trámite</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
+            <p className="text-[12px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">En Trámite</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-1.5 tabular-nums tracking-tight">
               ${totalPresentado.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">Pendiente de acreditación</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Pendiente de acreditación</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 flex items-center justify-center border border-amber-100 dark:border-amber-900">
+          <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-105 transition-transform">
             <Clock size={18} />
           </div>
         </div>
 
-        <div className="card p-4.5 flex items-center justify-between card-glow-emerald">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Cobrado</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
+            <p className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Cobrado</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-1.5 tabular-nums tracking-tight">
               ${totalCobrado.toLocaleString('es-AR')}
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">Acreditado en Banco</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Acreditado en Banco</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
             <CheckCircle2 size={18} />
           </div>
         </div>
 
-        <div className="card p-4.5 flex items-center justify-between">
+        <div className="glass-card p-5 rounded-2xl flex items-center justify-between group">
           <div>
-            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Convenios Activos</p>
-            <h3 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mt-1">
+            <p className="text-[12px] font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">Convenios Activos</p>
+            <h3 className="text-2xl sm:text-3xl font-semibold font-display text-slate-900 dark:text-white mt-1.5 tabular-nums tracking-tight">
               {obrasSociales.filter(o => o.id !== 'particular').length} O.S.
             </h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">IOSCOR, OSDE, Swiss, Medifé...</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 font-medium">IOSCOR, OSDE, Swiss, Medifé...</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+          <div className="w-10 h-10 rounded-2xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-105 transition-transform">
             <Award size={18} />
           </div>
         </div>
@@ -188,9 +193,9 @@ export const LiquidacionesView = ({
       </div>
 
       {/* Tabla de Presentaciones / Liquidaciones */}
-      <div className="card p-0 overflow-hidden">
+      <div className="glass-card p-0 rounded-2xl overflow-hidden shadow-sm border border-emerald-500/15">
         <div className="p-4 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             Historial de Planillas Presentadas
           </h3>
         </div>
@@ -203,7 +208,7 @@ export const LiquidacionesView = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Obra Social</th>
                   <th className="py-3 px-4">Período</th>
@@ -219,7 +224,7 @@ export const LiquidacionesView = ({
                   const os = getObraSocialById(liq.obraSocialId);
                   return (
                     <tr key={liq.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">
+                      <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white">
                         {os?.nombre || 'Obra Social'}
                       </td>
                       <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
@@ -228,17 +233,17 @@ export const LiquidacionesView = ({
                       <td className="py-3 px-4 text-slate-500 font-mono">
                         {liq.fechaPresentacion}
                       </td>
-                      <td className="py-3 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400">
+                      <td className="py-3 px-4 text-center font-semibold text-emerald-600 dark:text-emerald-400">
                         {liq.cantidadSesiones}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">
+                      <td className="py-3 px-4 text-right font-mono font-semibold text-slate-900 dark:text-white">
                         ${liq.montoBruto.toLocaleString('es-AR')}
                       </td>
                       <td className="py-3 px-4 text-center">
                         <select
                           value={liq.estado}
                           onChange={(e) => onUpdateLiquidacionEstado(liq.id, e.target.value)}
-                          className={`input-field py-1 px-2 text-[11px] font-semibold w-auto text-center ${
+                          className={`input-field py-1 px-2 text-[12px] font-semibold w-auto text-center ${
                             liq.estado === 'Cobrada' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                             liq.estado === 'Liquidada' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                             'bg-amber-50 text-amber-700 border-amber-200'
@@ -254,7 +259,7 @@ export const LiquidacionesView = ({
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleDescargarPDF(liq)}
-                            className="btn btn-secondary text-[11px] py-1 px-2.5 gap-1"
+                            className="btn btn-secondary text-[12px] py-1 px-2.5 gap-1"
                             title="Descargar Planilla en PDF oficial"
                           >
                             <Download size={12} />
@@ -286,7 +291,7 @@ export const LiquidacionesView = ({
 
       {/* Catálogo de Convenios y Aranceles */}
       <div className="card p-4 sm:p-5 space-y-3">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
           Convenios & Aranceles Vigentes (Colegio de Psicólogos / Directos)
         </h3>
         
@@ -294,20 +299,20 @@ export const LiquidacionesView = ({
           {obrasSociales.map((os) => (
             <div key={os.id} className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1 text-xs">
               <div className="flex items-center justify-between">
-                <strong className="text-xs text-slate-900 dark:text-white font-bold">{os.nombre}</strong>
-                <span className="badge bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
+                <strong className="text-xs text-slate-900 dark:text-white font-semibold">{os.nombre}</strong>
+                <span className="badge bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px]">
                   {os.tipo}
                 </span>
               </div>
-              <p className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">
+              <p className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
                 Arancel Sesión: ${os.arancelSesion.toLocaleString('es-AR')}
               </p>
               {os.coseguroRecomendado > 0 && (
-                <p className="text-slate-600 dark:text-slate-400 text-[11px]">
+                <p className="text-slate-600 dark:text-slate-400 text-[12px]">
                   Coseguro sugerido: ${os.coseguroRecomendado.toLocaleString('es-AR')}
                 </p>
               )}
-              <p className="text-[11px] text-slate-500 italic">
+              <p className="text-[12px] text-slate-500 italic">
                 {os.notasConvenio}
               </p>
             </div>
@@ -318,9 +323,9 @@ export const LiquidacionesView = ({
       {/* MODAL: GENERAR NUEVA PLANILLA */}
       {isModalOpen && (
         <div className="modal-backdrop">
-          <div className="card max-w-md w-full p-5 sm:p-6 shadow-xl space-y-3.5">
+          <div className="card max-w-md w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-3.5">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
-              <h3 className="text-sm font-bold font-display text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold font-display text-slate-900 dark:text-white">
                 Generar Planilla de Liquidación
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
