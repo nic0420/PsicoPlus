@@ -20,6 +20,7 @@ import {
   AlertTriangle, 
   Receipt
 } from 'lucide-react';
+import { todayISO } from '../../lib/dates';
 import { generateConstanciaPDF } from '../../services/pdfGenerator';
 import { generateWhatsappLink, createOrderAlertMessage } from '../../services/whatsapp';
 
@@ -54,7 +55,7 @@ export const PacientesView = ({
 
   // Estado para Nueva Evolución Modal / Form
   const [isEvoModalOpen, setIsEvoModalOpen] = useState(false);
-  const [evoFecha, setEvoFecha] = useState('2026-09-01');
+  const [evoFecha, setEvoFecha] = useState(todayISO());
   const [evoHora, setEvoHora] = useState('16:00');
   const [evoSedeId, setEvoSedeId] = useState('sede-centro');
   const [evoNumeroSesion, setEvoNumeroSesion] = useState(1);

@@ -19,6 +19,7 @@ import {
   Share2,
   Check
 } from 'lucide-react';
+import { todayISO } from '../../lib/dates';
 import { generateWhatsappLink, createReminderMessage } from '../../services/whatsapp';
 
 export const AgendaView = ({
@@ -39,14 +40,14 @@ export const AgendaView = ({
 }) => {
   const [filterSede, setFilterSede] = useState(selectedSedeId || 'all');
   const [filterEstado, setFilterEstado] = useState('all');
-  const [selectedFecha, setSelectedFecha] = useState('2026-09-01'); // Fecha demo activa
+  const [selectedFecha, setSelectedFecha] = useState(todayISO());
   const [agendaViewMode, setAgendaViewMode] = useState('grid'); // 'grid' | 'list'
   const [editingTurno, setEditingTurno] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Form State para Nuevo / Editar Turno
   const [formPacienteId, setFormPacienteId] = useState('');
-  const [formFecha, setFormFecha] = useState('2026-09-01');
+  const [formFecha, setFormFecha] = useState(todayISO());
   const [formHoraInicio, setFormHoraInicio] = useState('15:00');
   const [formHoraFin, setFormHoraFin] = useState('15:45');
   const [formSedeId, setFormSedeId] = useState('sede-centro');
@@ -91,7 +92,7 @@ export const AgendaView = ({
   const handleResetForm = () => {
     setEditingTurno(null);
     setFormPacienteId(pacientes[0]?.id || '');
-    setFormFecha('2026-09-01');
+    setFormFecha(todayISO());
     setFormHoraInicio('15:00');
     setFormHoraFin('15:45');
     setFormSedeId('sede-centro');
@@ -204,10 +205,10 @@ export const AgendaView = ({
             className="input-field py-1.5 px-3 text-xs w-auto font-mono font-semibold"
           />
           <button
-            onClick={() => setSelectedFecha('2026-09-01')}
-            className={`btn text-xs py-1.5 px-3 rounded-xl ${selectedFecha === '2026-09-01' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setSelectedFecha(todayISO())}
+            className={`btn text-xs py-1.5 px-3 rounded-xl ${selectedFecha === todayISO() ? 'btn-primary' : 'btn-secondary'}`}
           >
-            Hoy (Demo)
+            Hoy
           </button>
           <button
             onClick={() => setSelectedFecha('')}
@@ -298,11 +299,11 @@ export const AgendaView = ({
 
             const isWebRequested = turno.estado === 'Solicitado (Web)';
             const borderAccent = isWebRequested 
-              ? 'border-l-4 border-l-teal-400' 
+              ? 'border-l-4 border-l-teal-500' 
               : turno.estado === 'Atendido' 
               ? 'border-l-4 border-l-emerald-500' 
               : turno.estado === 'Confirmado' 
-              ? 'border-l-4 border-l-emerald-600' 
+              ? 'border-l-4 border-l-sky-500' 
               : turno.estado === 'Por Confirmar' 
               ? 'border-l-4 border-l-amber-500' 
               : 'border-l-4 border-l-rose-500';

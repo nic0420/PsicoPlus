@@ -18,6 +18,7 @@ import {
   RefreshCw,
   FileCheck
 } from 'lucide-react';
+import { periodoLabel } from '../../lib/dates';
 import { generateFacturaPDF } from '../../services/pdfGenerator';
 import { generateWhatsappLink, createFacturaNotificationMessage } from '../../services/whatsapp';
 import { 
@@ -58,7 +59,7 @@ export const FacturasView = ({
   const [formTipoComprobante, setFormTipoComprobante] = useState('Factura C');
   const [formNumeroFactura, setFormNumeroFactura] = useState('');
   const [formFechaEmision, setFormFechaEmision] = useState(() => new Date().toISOString().split('T')[0]);
-  const [formPeriodo, setFormPeriodo] = useState('Septiembre 2026');
+  const [formPeriodo, setFormPeriodo] = useState(periodoLabel());
   const [formFechaServicioDesde, setFormFechaServicioDesde] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
   const [formFechaServicioHasta, setFormFechaServicioHasta] = useState(() => new Date().toISOString().split('T')[0]);
   const [formFechaVencimientoPago, setFormFechaVencimientoPago] = useState(() => new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]);
@@ -116,7 +117,7 @@ export const FacturasView = ({
     const nextNum = getNextFacturaNumber();
     setFormNumeroFactura(nextNum);
     setFormFechaEmision(new Date().toISOString().split('T')[0]);
-    setFormPeriodo('Septiembre 2026');
+    setFormPeriodo(periodoLabel());
     setFormTipoComprobante('Factura C');
     setFormCondicionVenta('Transferencia Bancaria');
     setFormCondicionIvaReceptor('Consumidor Final');

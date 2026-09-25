@@ -1,3 +1,4 @@
+import { addDaysISO } from '../lib/dates';
 // Datos iniciales de demostración para PsicoPlus (Corrientes, Argentina)
 
 export const INITIAL_SEDES = [
@@ -282,7 +283,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-1',
     pacienteId: 'pac-1',
-    fecha: '2026-09-01', // Hoy
+    fecha: addDaysISO(0), // Hoy
     horaInicio: '14:30',
     horaFin: '15:15',
     sedeId: 'sede-centro',
@@ -296,7 +297,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-2',
     pacienteId: 'pac-3',
-    fecha: '2026-09-01', // Hoy
+    fecha: addDaysISO(0), // Hoy
     horaInicio: '16:00',
     horaFin: '16:45',
     sedeId: 'sede-centro',
@@ -310,7 +311,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-3',
     pacienteId: 'pac-2',
-    fecha: '2026-09-02', // Mañana
+    fecha: addDaysISO(1), // Mañana
     horaInicio: '10:00',
     horaFin: '10:45',
     sedeId: 'sede-sanmartin',
@@ -324,7 +325,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-4',
     pacienteId: 'pac-5',
-    fecha: '2026-09-02', // Mañana
+    fecha: addDaysISO(1), // Mañana
     horaInicio: '11:15',
     horaFin: '12:00',
     sedeId: 'sede-sanmartin',
@@ -338,7 +339,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-5',
     pacienteId: 'pac-4',
-    fecha: '2026-09-04', // Viernes
+    fecha: addDaysISO(3),
     horaInicio: '11:00',
     horaFin: '11:45',
     sedeId: 'sede-online',
@@ -352,7 +353,7 @@ export const INITIAL_TURNOS = [
   {
     id: 'turno-6',
     pacienteId: 'pac-1',
-    fecha: '2026-09-08',
+    fecha: addDaysISO(7),
     horaInicio: '16:00',
     horaFin: '16:45',
     sedeId: 'sede-centro',

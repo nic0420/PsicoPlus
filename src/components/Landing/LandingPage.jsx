@@ -52,9 +52,19 @@ const useReveal = () => {
   return ref;
 };
 
+/* Acentos cálidos: cada funcionalidad tiene su color */
+const TONES = {
+  petroleo: { chip: 'bg-[#e3efeb] text-[#22554d]', panel: 'bg-[#e6efe9]', icon: 'text-[#2b685d]', dot: 'bg-[#2b685d]' },
+  terracota: { chip: 'bg-[#f8e4dc] text-[#9f4634]', panel: 'bg-[#f6e6de]', icon: 'text-[#bb5a43]', dot: 'bg-[#bb5a43]' },
+  ocre: { chip: 'bg-[#f6ead2] text-[#7a4f1f]', panel: 'bg-[#f3e7cd]', icon: 'text-[#b9802c]', dot: 'bg-[#b9802c]' },
+  pizarra: { chip: 'bg-[#e2ebf2] text-[#354e64]', panel: 'bg-[#e1e9f0]', icon: 'text-[#4f7593]', dot: 'bg-[#4f7593]' },
+  salvia: { chip: 'bg-[#e6eddf] text-[#455a3d]', panel: 'bg-[#e3ebdb]', icon: 'text-[#6e8b61]', dot: 'bg-[#6e8b61]' },
+};
+
 const FEATURES = [
   {
     id: 'agenda',
+    tone: 'petroleo',
     label: 'Agenda y WhatsApp',
     icon: CalendarDays,
     title: 'Agenda multisede con recordatorios en un toque',
@@ -66,6 +76,7 @@ const FEATURES = [
   },
   {
     id: 'pacientes',
+    tone: 'terracota',
     label: 'Historias clínicas',
     icon: Users,
     title: 'Ficha clínica y evolución cronológica',
@@ -77,6 +88,7 @@ const FEATURES = [
   },
   {
     id: 'obras-sociales',
+    tone: 'ocre',
     label: 'Obras sociales',
     icon: Receipt,
     title: 'Liquidaciones y convenios pre-configurados',
@@ -88,6 +100,7 @@ const FEATURES = [
   },
   {
     id: 'portal',
+    tone: 'pizarra',
     label: 'Portal de turnos',
     icon: Globe,
     title: 'Tus pacientes reservan solos, vos confirmás',
@@ -99,6 +112,7 @@ const FEATURES = [
   },
   {
     id: 'finanzas',
+    tone: 'salvia',
     label: 'Finanzas y ARCA',
     icon: TrendingUp,
     title: 'Caja, honorarios y facturas ARCA',
@@ -132,6 +146,9 @@ const FAQS = [
     a: 'Viene con aranceles pre-configurados para las principales obras sociales y prepagas de Argentina (IOSCOR, OSDE, Swiss Medical, Medifé, Galeno, Sancor Salud, PAMI, etc.) y podés personalizar o agregar las de tu provincia.',
   },
 ];
+
+/* Activar cuando tengas testimonios reales de colegas, con su autorización por escrito. */
+const SHOW_TESTIMONIOS = false;
 
 const TESTIMONIOS = [
   {
@@ -184,7 +201,7 @@ const HeroMockup = () => {
         <div className="p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[12px] text-[#78756c]">Martes 1 de septiembre</p>
+              <p className="text-[12px] text-[#78756c] first-letter:uppercase">{new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
               <p className="font-serif text-[1.65rem] leading-tight text-[#1b1d1a]">
                 Buen día, <em className="text-[#22554d]">Virna</em>.
               </p>
@@ -276,12 +293,14 @@ export const LandingPage = ({
 
   const feature = FEATURES.find((f) => f.id === activeTabFeature) || FEATURES[0];
   const FeatureIcon = feature.icon;
+  const tone = TONES[feature.tone] || TONES.petroleo;
 
   const navLinks = [
     ['#caracteristicas', 'Funcionalidades'],
     ['#obras-sociales', 'Obras sociales y ARCA'],
     ['#precios', 'Precios'],
-    ['#testimonios', 'Testimonios'],
+    ['#app', 'La app'],
+    ...(SHOW_TESTIMONIOS ? [['#testimonios', 'Testimonios']] : []),
     ['#faq', 'Preguntas'],
   ];
 
@@ -294,8 +313,7 @@ export const LandingPage = ({
     >
       {/* Anuncio */}
       <div className="bg-[#1c4540] text-[#d9eae5] text-[13px] py-2 px-4 text-center">
-        <span className="font-medium text-[#f4f1e8]">Lanzamiento 2026</span>
-        <span className="mx-2 opacity-40">·</span>
+        <span className="inline-block mr-2 px-2 py-px rounded-full bg-[#deb56b] text-[#2b1b0c] text-[11.5px] font-semibold">Lanzamiento 2026</span>
         Comenzá tu consultorio digital gratis, sin tarjeta de crédito.
       </div>
 
@@ -355,7 +373,12 @@ export const LandingPage = ({
             </p>
             <h1 className="reveal font-serif text-[2.9rem] leading-[0.98] sm:text-[4rem] lg:text-[4.6rem] tracking-[-0.02em] mt-6" style={{ '--i': 1 }}>
               Menos tiempo en planillas,{' '}
-              <em className="text-[#22554d]">más tiempo</em> para tus pacientes.
+              <em className="relative inline-block text-[#22554d]">
+                más tiempo
+                <svg aria-hidden="true" viewBox="0 0 300 18" preserveAspectRatio="none" className="absolute left-0 -bottom-1 sm:-bottom-2 w-full h-[0.28em] text-[#cf7760]">
+                  <path d="M3 13 C 60 4, 140 3, 297 9" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+                </svg>
+              </em> para tus pacientes.
             </h1>
             <p className="reveal text-[17px] sm:text-[18px] leading-relaxed text-[#5c5a53] mt-6 max-w-[34rem]" style={{ '--i': 2 }}>
               Agenda multisede, fichas clínicas protegidas por secreto profesional, control de órdenes de obras sociales y un portal para que tus pacientes reserven solos.
@@ -373,7 +396,7 @@ export const LandingPage = ({
             </div>
 
             <ul className="reveal flex flex-wrap gap-x-6 gap-y-2 mt-8 text-[13.5px] text-[#5c5a53]" style={{ '--i': 4 }}>
-              {['Plan gratuito sin vencimiento', 'Sin tarjeta de crédito', 'Cumple Ley 25.326'].map((t) => (
+              {['Plan gratuito sin vencimiento', 'Sin tarjeta de crédito', 'Pensado según la Ley 25.326'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check size={15} className="text-[#2b685d]" /> {t}
                 </li>
@@ -381,9 +404,14 @@ export const LandingPage = ({
             </ul>
           </div>
 
-          <div className="reveal lg:pl-6" style={{ '--i': 2 }}>
-            <HeroMockup />
-            <p className="text-center text-[12.5px] text-[#8c8d85] mt-4">
+          <div className="reveal relative lg:pl-6" style={{ '--i': 2 }}>
+            <div aria-hidden="true" className="absolute -z-0 -inset-x-4 sm:-inset-x-8 top-10 bottom-10 rounded-[40%_60%_55%_45%/50%_45%_55%_50%] bg-[#f3e2d5] rotate-[-4deg]" />
+            <div aria-hidden="true" className="absolute -right-4 bottom-16 w-24 h-24 rounded-full bg-[#dfe8d8]" />
+            <div aria-hidden="true" className="absolute -left-3 top-2 w-10 h-10 rounded-full bg-[#deb56b]/70" />
+            <div className="relative">
+              <HeroMockup />
+            </div>
+            <p className="relative text-center sm:text-right text-[12.5px] text-[#78756c] mt-6 sm:mt-14">
               Probá el botón <span className="text-[#46453f] font-medium">Privacidad</span>: oculta datos sensibles al instante.
             </p>
           </div>
@@ -416,9 +444,9 @@ export const LandingPage = ({
 
             <ol className="divide-y divide-[#e3dfd5] border-y border-[#e3dfd5]">
               {[
-                { icon: BellRing, t: 'Se acabaron las órdenes vencidas', d: 'Te avisamos cuando a un paciente le quedan 2 sesiones autorizadas, para que pidas el nuevo pedido médico a tiempo.' },
-                { icon: EyeOff, t: 'Modo privacidad en un clic', d: 'Ocultá al instante nombres, diagnósticos y contactos si entra alguien al consultorio con la pantalla encendida.' },
-                { icon: Globe, t: 'Tus pacientes reservan solos', d: 'Compartí tu link de reservas en Instagram o WhatsApp: eligen día y horario sin interrumpir tus sesiones.' },
+                { icon: BellRing, tone: 'ocre', t: 'Se acabaron las órdenes vencidas', d: 'Te avisamos cuando a un paciente le quedan 2 sesiones autorizadas, para que pidas el nuevo pedido médico a tiempo.' },
+                { icon: EyeOff, tone: 'terracota', t: 'Modo privacidad en un clic', d: 'Ocultá al instante nombres, diagnósticos y contactos si entra alguien al consultorio con la pantalla encendida.' },
+                { icon: Globe, tone: 'pizarra', t: 'Tus pacientes reservan solos', d: 'Compartí tu link de reservas en Instagram o WhatsApp: eligen día y horario sin interrumpir tus sesiones.' },
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
@@ -426,7 +454,9 @@ export const LandingPage = ({
                     <span className="font-mono text-[13px] text-[#a29e93] pt-1.5">0{i + 1}</span>
                     <div>
                       <div className="flex items-center gap-3">
-                        <Icon size={19} className="text-[#2b685d]" />
+                        <span className={`w-9 h-9 rounded-xl grid place-items-center flex-shrink-0 ${TONES[item.tone].chip}`}>
+                          <Icon size={18} />
+                        </span>
                         <h3 className="text-[1.25rem] font-semibold tracking-[-0.015em]">{item.t}</h3>
                       </div>
                       <p className="text-[15.5px] leading-relaxed text-[#5c5a53] mt-2.5 max-w-lg">{item.d}</p>
@@ -439,7 +469,7 @@ export const LandingPage = ({
         </section>
 
         {/* FUNCIONALIDADES */}
-        <section id="caracteristicas" className="bg-[#fffefb] border-y border-[#e3dfd5] scroll-mt-16">
+        <section id="caracteristicas" className="bg-[#eef2ea] border-y border-[#dfe6d7] scroll-mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 lg:py-28">
             <div className="max-w-2xl">
               <p className="reveal text-[13px] font-medium text-[#2b685d]">Todo en un solo lugar</p>
@@ -460,19 +490,20 @@ export const LandingPage = ({
                       aria-selected={isActive}
                       onClick={() => setActiveTabFeature(f.id)}
                       className={`flex-shrink-0 h-11 px-3.5 inline-flex items-center gap-3 rounded-lg text-[14.5px] font-medium text-left whitespace-nowrap transition-colors duration-150 ${
-                        isActive ? 'bg-[#1d1f1c] text-[#f4f1e8]' : 'text-[#5c5a53] hover:bg-[#1b1d1a]/[0.05] hover:text-[#1b1d1a]'
+                        isActive ? 'bg-[#1d1f1c] text-[#f4f1e8]' : 'text-[#46453f] hover:bg-[#1b1d1a]/[0.05] hover:text-[#1b1d1a]'
                       }`}
                     >
-                      <Icon size={17} className={isActive ? 'text-[#b5d5cc]' : 'text-[#a29e93]'} />
+                      <span className={`w-2 h-2 rounded-full ${TONES[f.tone].dot} ${isActive ? '' : 'opacity-60'}`} />
+                      <Icon size={17} className={isActive ? 'text-[#f4f1e8]' : TONES[f.tone].icon} />
                       {f.label}
                     </button>
                   );
                 })}
               </div>
 
-              <div key={feature.id} role="tabpanel" className="grid md:grid-cols-[1.1fr_1fr] rounded-2xl border border-[#e3dfd5] overflow-hidden animate-fade-in">
+              <div key={feature.id} role="tabpanel" className="grid md:grid-cols-[1.1fr_1fr] rounded-2xl border border-[#dfe6d7] overflow-hidden animate-fade-in bg-[#fffefb] shadow-[0_24px_48px_-28px_rgba(27,29,26,.25)]">
                 <div className="p-7 sm:p-9 bg-[#fffefb]">
-                  <span className="w-10 h-10 rounded-xl bg-[#eef5f3] text-[#22554d] grid place-items-center">
+                  <span className={`w-10 h-10 rounded-xl grid place-items-center ${tone.chip}`}>
                     <FeatureIcon size={19} />
                   </span>
                   <h3 className="font-serif text-[1.9rem] leading-[1.08] mt-5">{feature.title}</h3>
@@ -489,7 +520,7 @@ export const LandingPage = ({
                   </button>
                 </div>
 
-                <div className="bg-[#f1efe9] p-6 sm:p-8 flex items-center justify-center border-t md:border-t-0 md:border-l border-[#e3dfd5]">
+                <div className={`${tone.panel} p-6 sm:p-8 flex items-center justify-center transition-colors duration-300`}>
                   <div className="w-full max-w-[300px] rounded-xl bg-[#fffefb] border border-[#e3dfd5] shadow-[0_20px_40px_-20px_rgba(27,29,26,.25)] p-4">
                     <div className="flex items-center gap-3 pb-3 border-b border-[#ece9e1]">
                       <span className="w-9 h-9 rounded-full bg-[#eef5f3] text-[#22554d] grid place-items-center text-[12px] font-semibold">VT</span>
@@ -616,7 +647,71 @@ export const LandingPage = ({
           </div>
         </section>
 
-        {/* TESTIMONIOS */}
+        {/* LA APP POR DENTRO (capturas reales) */}
+        <section id="app" className="bg-[#f6ece3] border-y border-[#ecdccd] scroll-mt-16 overflow-hidden">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 lg:py-28">
+            <div className="grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-end">
+              <div>
+                <p className="reveal text-[13px] font-medium text-[#9f4634]">Así se ve por dentro</p>
+                <h2 className="reveal font-serif text-[2.4rem] sm:text-[3rem] leading-[1.02] tracking-[-0.015em] mt-3" style={{ '--i': 1 }}>
+                  Tu día entero, en una sola pantalla.
+                </h2>
+              </div>
+              <p className="reveal text-[16px] text-[#5c5a53] leading-relaxed max-w-lg" style={{ '--i': 2 }}>
+                Turnos, próximo paciente, cobros y órdenes por renovar de un vistazo. En la compu del consultorio o en el celular, entre sesión y sesión.
+              </p>
+            </div>
+
+            {/* Móvil: captura del celular */}
+            <div className="sm:hidden reveal mt-12 mx-auto w-[250px] rounded-[30px] bg-[#1d1f1c] p-2 shadow-[0_30px_60px_-24px_rgba(27,29,26,.55)]">
+              <img
+                src="/landing/app-movil.webp"
+                alt="PsicoPlus en el celular: saludo, indicadores del día y turnero"
+                width="390"
+                height="844"
+                loading="lazy"
+                className="block w-full h-auto rounded-[23px]"
+              />
+            </div>
+
+            <div className="hidden sm:block reveal relative mt-14" style={{ '--i': 1 }}>
+              <div className="rounded-2xl bg-[#fffefb] border border-[#e3dfd5] shadow-[0_40px_80px_-40px_rgba(80,40,20,.35)] overflow-hidden">
+                <div className="h-9 px-4 flex items-center gap-1.5 border-b border-[#ece9e1] bg-[#f7f5f0]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#e3dfd5]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#e3dfd5]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#e3dfd5]" />
+                </div>
+                <img
+                  src="/landing/app-escritorio.webp"
+                  alt="Panel Consultorio en vivo de PsicoPlus con turnero del día, indicadores y próximo paciente"
+                  width="1440"
+                  height="900"
+                  loading="lazy"
+                  className="block w-full h-auto"
+                />
+              </div>
+              <div className="hidden sm:block absolute -right-2 lg:-right-8 -bottom-10 w-[170px] lg:w-[210px] rounded-[28px] bg-[#1d1f1c] p-2 shadow-[0_30px_60px_-24px_rgba(27,29,26,.55)] rotate-[3deg]">
+                <img
+                  src="/landing/app-movil.webp"
+                  alt="PsicoPlus en el celular"
+                  width="390"
+                  height="844"
+                  loading="lazy"
+                  className="block w-full h-auto rounded-[22px]"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3 mt-16 sm:mt-20">
+              <button onClick={onOpenDemo} className="h-11 px-5 inline-flex items-center gap-2 rounded-xl bg-[#1d1f1c] text-[#f4f1e8] text-[14.5px] font-medium hover:bg-[#2c2d29] active:scale-[0.97] transition-[background-color,transform] duration-150">
+                <Play size={15} /> Probar la demo interactiva
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIOS — se muestran solo cuando SHOW_TESTIMONIOS = true (usar testimonios reales, con consentimiento) */}
+        {SHOW_TESTIMONIOS && (
         <section id="testimonios" className="bg-[#fffefb] border-y border-[#e3dfd5] scroll-mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 lg:py-28">
             <p className="reveal text-[13px] font-medium text-[#2b685d]">Experiencias</p>
@@ -649,6 +744,7 @@ export const LandingPage = ({
             </div>
           </div>
         </section>
+        )}
 
         {/* FAQ */}
         <section id="faq" className="max-w-6xl mx-auto px-4 sm:px-6 py-24 lg:py-32 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-20 scroll-mt-16">
@@ -758,7 +854,7 @@ export const LandingPage = ({
               </li>
               <li className="flex gap-2.5">
                 <Receipt size={16} className="text-[#2b685d] flex-shrink-0 mt-0.5" />
-                <span><span className="text-[#1b1d1a] font-medium">ARCA RG 4291.</span> Comprobantes con QR y CAE homologado.</span>
+                <span><span className="text-[#1b1d1a] font-medium">ARCA RG 4291.</span> Comprobantes con CAE y código QR.</span>
               </li>
             </ul>
           </div>

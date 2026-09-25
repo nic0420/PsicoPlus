@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Receipt
 } from 'lucide-react';
+import { sedeTone } from '../../lib/tones';
+import { todayISO, addDaysISO, parseISODate, periodoLabel } from '../../lib/dates';
 import { generateWhatsappLink, createReminderMessage, createOrderAlertMessage } from '../../services/whatsapp';
 
 const money = (value) => `$${(value || 0).toLocaleString('es-AR')}`;
@@ -34,8 +36,9 @@ export const DashboardView = ({
   onOpenPacienteDetalle,
   onActualizarTurnoEstado,
 }) => {
-  // Active day selection for the Turnero (defaults to demo date 2026-09-01)
-  const [selectedFecha, setSelectedFecha] = useState('2026-09-01');
+  // Día activo del turnero (por defecto, hoy)
+  const hoy = todayISO();
+  const [selectedFecha, setSelectedFecha] = useState(hoy);
   const [filterModality, setFilterModality] = useState('all'); // 'all' | 'Presencial' | 'Online'
   const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'Confirmado' | 'Atendido' | 'Pendiente'
 
@@ -45,14 +48,19 @@ export const DashboardView = ({
 
   // Week strip dates (Centered on demo week)
   const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  const weekDays = ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05', '2026-09-06'].map((fecha, idx) => ({
+  const weekDays = [0, 1, 2, 3, 4, 5].map((n) => addDaysISO(n)).map((fecha, idx) => ({
     fecha,
     dayName: DAY_NAMES[new Date(`${fecha}T12:00:00`).getDay()],
     dayNum: fecha.slice(8),
-    month: 'Sep',
     isToday: idx === 0,
   }));
-  const calFirstOffset = new Date('2026-09-01T12:00:00').getDay();
+  // Mini calendario: mes del día seleccionado
+  const calBase = parseISODate(selectedFecha);
+  const calYear = calBase.getFullYear();
+  const calMonth = calBase.getMonth();
+  const calFirstOffset = new Date(calYear, calMonth, 1, 12).getDay();
+  const calDaysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const calMonthPrefix = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
   const formatFechaLarga = (fecha) =>
     fecha
       ? new Date(`${fecha}T12:00:00`).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -120,10 +128,10 @@ export const DashboardView = ({
     }`;
 
   const stats = [
-    { label: 'Sesiones del día', value: totalDelDia, hint: `${atendidos} atendida${atendidos === 1 ? '' : 's'}`, icon: Users },
-    { label: 'Cobrado', value: money(ingresosCoseguros), hint: 'coseguros del día', icon: WalletCards, sensitive: true },
-    { label: 'Por cobrar', value: money(totalCosegurosPendientes), hint: 'coseguros pendientes', icon: DollarSign, sensitive: true, tone: totalCosegurosPendientes > 0 ? 'amber' : null },
-    { label: 'Órdenes por renovar', value: alertas.length, hint: 'obras sociales', icon: ShieldAlert, tone: alertas.length > 0 ? 'amber' : null, onClick: () => onNavigateTab('pacientes') },
+    { label: 'Sesiones del día', value: totalDelDia, hint: `${atendidos} atendida${atendidos === 1 ? '' : 's'}`, icon: Users, chip: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' },
+    { label: 'Cobrado', value: money(ingresosCoseguros), hint: 'coseguros del día', icon: WalletCards, sensitive: true, chip: 'bg-teal-100 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300' },
+    { label: 'Por cobrar', value: money(totalCosegurosPendientes), hint: 'coseguros pendientes', icon: DollarSign, sensitive: true, tone: totalCosegurosPendientes > 0 ? 'amber' : null, chip: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300' },
+    { label: 'Órdenes por renovar', value: alertas.length, hint: 'obras sociales', icon: ShieldAlert, tone: alertas.length > 0 ? 'rose' : null, onClick: () => onNavigateTab('pacientes'), chip: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300' },
   ];
 
   return (
@@ -182,9 +190,9 @@ export const DashboardView = ({
             >
               <div className="flex items-center justify-between text-slate-500">
                 <span className="text-[12.5px] font-medium">{s.label}</span>
-                <Icon size={15} className={s.tone === 'amber' ? 'text-amber-600' : 'text-slate-400'} />
+                <span className={`w-8 h-8 rounded-lg grid place-items-center ${s.chip}`}><Icon size={16} /></span>
               </div>
-              <p className={`mt-2 text-[1.6rem] sm:text-[1.75rem] leading-none font-semibold tracking-[-0.02em] tabular-nums ${s.tone === 'amber' ? 'text-amber-700 dark:text-amber-300' : 'text-slate-900 dark:text-slate-50'} ${s.sensitive && privacyMode ? 'privacy-blur' : ''}`}>
+              <p className={`mt-1 text-[1.6rem] sm:text-[1.75rem] leading-none font-semibold tracking-[-0.02em] tabular-nums ${s.tone === 'amber' ? 'text-amber-700 dark:text-amber-300' : s.tone === 'rose' ? 'text-rose-700 dark:text-rose-300' : 'text-slate-900 dark:text-slate-50'} ${s.sensitive && privacyMode ? 'privacy-blur' : ''}`}>
                 {s.value}
               </p>
               <p className="text-[12px] text-slate-500 mt-1.5">{s.hint}</p>
@@ -303,6 +311,7 @@ export const DashboardView = ({
                           const pacOs = os?.nombre || 'Particular';
                           const isPresencial = turno.modalidad === 'Presencial';
                           const isAtendido = turno.estado === 'Atendido';
+                          const tone = sedeTone(sedeTurno);
 
                           const waLink = pacTel
                             ? generateWhatsappLink(
@@ -327,7 +336,7 @@ export const DashboardView = ({
                                 isAtendido ? 'border-[var(--border-subtle)] opacity-75' : 'border-[var(--border-color)]'
                               }`}
                             >
-                              <span className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${isPresencial ? 'bg-emerald-600' : 'bg-sky-500'}`} />
+                              <span className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${tone.bar}`} />
 
                               <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <div className="hidden sm:grid w-9 h-9 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200 place-items-center text-[12px] font-semibold flex-shrink-0">
@@ -349,6 +358,11 @@ export const DashboardView = ({
                                     <span className={`inline-flex items-center gap-1 ${isPresencial ? 'text-emerald-700 dark:text-emerald-300' : 'text-sky-700 dark:text-sky-300'}`}>
                                       {isPresencial ? <Building2 size={12} /> : <Video size={12} />}
                                       {turno.modalidad}
+                                    </span>
+                                    <span className="text-slate-300 dark:text-slate-600">·</span>
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
+                                      {sedeTurno?.nombre?.split('-')[0].trim() || 'Sede'}
                                     </span>
                                     <span className="text-slate-300 dark:text-slate-600">·</span>
                                     <span>{pacOs}</span>
@@ -500,9 +514,9 @@ export const DashboardView = ({
           {/* Mini calendario */}
           <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[14px] font-semibold text-slate-900 dark:text-slate-50">Septiembre 2026</span>
+              <span className="text-[14px] font-semibold text-slate-900 dark:text-slate-50">{periodoLabel(calBase)}</span>
               <button
-                onClick={() => setSelectedFecha('2026-09-01')}
+                onClick={() => setSelectedFecha(hoy)}
                 className="text-[12.5px] font-medium text-emerald-700 dark:text-emerald-300 hover:underline underline-offset-2"
               >
                 Hoy
@@ -513,9 +527,9 @@ export const DashboardView = ({
                 <div key={i} className="text-[11px] font-medium text-slate-400 pb-1">{d}</div>
               ))}
               {Array.from({ length: calFirstOffset }, (_, i) => <div key={`e${i}`} />)}
-              {Array.from({ length: 30 }, (_, i) => {
+              {Array.from({ length: calDaysInMonth }, (_, i) => {
                 const dayNum = i + 1;
-                const formattedDate = `2026-09-${dayNum < 10 ? '0' + dayNum : dayNum}`;
+                const formattedDate = `${calMonthPrefix}-${dayNum < 10 ? '0' + dayNum : dayNum}`;
                 const hasTurnos = countTurnosDay(formattedDate) > 0;
                 const isSelected = selectedFecha === formattedDate;
                 return (
@@ -526,6 +540,8 @@ export const DashboardView = ({
                     className={`relative h-9 rounded-lg text-[13px] tabular-nums transition-colors ${
                       isSelected
                         ? 'bg-emerald-700 text-[#f4f1e8] font-semibold dark:bg-emerald-300 dark:text-emerald-950'
+                        : formattedDate === hoy
+                        ? 'text-emerald-800 dark:text-emerald-200 font-semibold ring-1 ring-inset ring-emerald-300 dark:ring-emerald-700'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06]'
                     }`}
                   >

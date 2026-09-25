@@ -14,6 +14,7 @@ import {
   Award,
   Trash2
 } from 'lucide-react';
+import { periodoLabel } from '../../lib/dates';
 import { generatePlanillaLiquidacionPDF } from '../../services/pdfGenerator';
 
 import { ProBadge } from '../Common/ProBadge';
@@ -31,7 +32,7 @@ export const LiquidacionesView = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOSId, setSelectedOSId] = useState('ioscor');
-  const [periodo, setPeriodo] = useState('Septiembre 2026');
+  const [periodo, setPeriodo] = useState(periodoLabel());
   const [observaciones, setObservaciones] = useState('');
 
   // Estadísticas rápidas de liquidaciones

@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Building2,
-  MapPin,
-  Video,
   Eye,
   EyeOff,
   ShieldAlert,
@@ -16,6 +13,7 @@ import {
 } from 'lucide-react';
 import { PLANS } from '../services/subscription';
 import { BrandMark } from './Common/BrandMark';
+import { sedeTone } from '../lib/tones';
 
 const TAB_TITLES = {
   dashboard: 'Consultorio en vivo',
@@ -61,13 +59,6 @@ export const Header = ({
     const timer = setInterval(() => setTime(new Date()), 15000);
     return () => clearInterval(timer);
   }, []);
-
-  const getSedeIcon = (id) => {
-    if (id === 'sede-centro') return <Building2 size={14} />;
-    if (id === 'sede-sanmartin') return <MapPin size={14} />;
-    if (id === 'sede-online') return <Video size={14} />;
-    return <Building2 size={14} />;
-  };
 
   const shortName = (nombre = '') => nombre.split('-')[0].trim();
   const dateLabel = time.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -120,7 +111,7 @@ export const Header = ({
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                 }`}
               >
-                <span className="opacity-70">{getSedeIcon(sede.id)}</span>
+                <span className={`w-2 h-2 rounded-full ${sedeTone(sede).dot}`} />
                 {shortName(sede.nombre)}
               </button>
             ))}

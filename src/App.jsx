@@ -32,10 +32,25 @@ export function AppContent() {
   const urlParams = new URLSearchParams(window.location.search);
   const isDirectPortal = urlParams.get('portal') === 'paciente' || urlParams.get('portal') === 'turnos' || urlParams.get('reserva') === 'true';
   const isDirectLanding = urlParams.get('landing') === 'true';
+  const isDirectApp = urlParams.get('app') === 'true' || urlParams.get('demo') === 'true';
+
+  // Visitantes nuevos (sin sesión guardada) ven primero la landing pública.
+  let hasStoredSession = false;
+  try {
+    hasStoredSession = !!localStorage.getItem('psicoplus_current_user_v1');
+  } catch {
+    hasStoredSession = false;
+  }
 
   // Navigation & View Mode
   const [viewMode, setViewMode] = useState(
-    isDirectPortal ? 'portal-standalone' : isDirectLanding ? 'landing' : 'app'
+    isDirectPortal
+      ? 'portal-standalone'
+      : isDirectLanding
+      ? 'landing'
+      : isDirectApp || hasStoredSession
+      ? 'app'
+      : 'landing'
   );
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSedeId, setSelectedSedeId] = useState('all');
