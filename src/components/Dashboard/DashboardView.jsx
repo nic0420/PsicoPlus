@@ -346,7 +346,7 @@ export const DashboardView = ({
                                   <div className="flex items-baseline gap-2 min-w-0">
                                     <button
                                       onClick={() => pac && onOpenPacienteDetalle(pac)}
-                                      className={`text-[14.5px] font-semibold text-slate-900 dark:text-slate-50 hover:text-emerald-700 dark:hover:text-emerald-300 truncate transition-colors ${privacyMode ? 'privacy-blur' : ''}`}
+                                      className={`py-1.5 -my-1.5 text-[14.5px] font-semibold text-slate-900 dark:text-slate-50 hover:text-emerald-700 dark:hover:text-emerald-300 truncate transition-colors ${privacyMode ? 'privacy-blur' : ''}`}
                                     >
                                       {pacNombre}
                                     </button>
@@ -418,7 +418,7 @@ export const DashboardView = ({
                                 {pac && (
                                   <button
                                     onClick={() => onOpenPacienteDetalle(pac)}
-                                    className="h-8 w-8 inline-grid place-items-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06] dark:hover:text-slate-100 transition-colors"
+                                    className="flex-shrink-0 h-8 w-8 inline-grid place-items-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06] dark:hover:text-slate-100 transition-colors"
                                     title="Ver historia clínica"
                                     aria-label="Ver ficha"
                                   >
@@ -517,7 +517,7 @@ export const DashboardView = ({
               <span className="text-[14px] font-semibold text-slate-900 dark:text-slate-50">{periodoLabel(calBase)}</span>
               <button
                 onClick={() => setSelectedFecha(hoy)}
-                className="text-[12.5px] font-medium text-emerald-700 dark:text-emerald-300 hover:underline underline-offset-2"
+                className="h-9 -my-2 px-2 -mr-2 text-[12.5px] font-medium text-emerald-700 dark:text-emerald-300 hover:underline underline-offset-2"
               >
                 Hoy
               </button>
@@ -561,7 +561,7 @@ export const DashboardView = ({
               <span className="text-[14px] font-semibold text-slate-900 dark:text-slate-50">Caja del día</span>
               <button
                 onClick={() => onNavigateTab('finanzas')}
-                className="text-[12.5px] font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-0.5"
+                className="h-9 -my-2 px-2 -mr-2 text-[12.5px] font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 inline-flex items-center gap-0.5"
               >
                 Finanzas <ArrowUpRight size={13} />
               </button>

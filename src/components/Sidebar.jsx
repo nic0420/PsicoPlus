@@ -62,6 +62,12 @@ export const Sidebar = ({
 
   const settingsItem = { id: 'configuracion', label: 'Configuración', icon: Settings };
 
+  // En móvil, cualquier acción del menú cierra el cajón antes de ejecutarse
+  const closeThen = (fn) => (...args) => {
+    if (onCloseMobile) onCloseMobile();
+    if (fn) fn(...args);
+  };
+
   const handleItemClick = (id) => {
     onTabChange(id);
     if (onCloseMobile) onCloseMobile();
@@ -173,7 +179,7 @@ export const Sidebar = ({
                 />
               </div>
               <button
-                onClick={onOpenUpgradeModal}
+                onClick={closeThen(onOpenUpgradeModal)}
                 className="w-full h-8 rounded-lg bg-slate-900 text-[#f4f1e8] dark:bg-slate-100 dark:text-slate-900 text-[12.5px] font-medium flex items-center justify-center gap-1.5 hover:bg-slate-800 active:scale-[0.97] transition-[background-color,transform] duration-150"
               >
                 <Sparkles size={13} />
@@ -182,7 +188,7 @@ export const Sidebar = ({
             </div>
           ) : (
             <button
-              onClick={onOpenUpgradeModal}
+              onClick={closeThen(onOpenUpgradeModal)}
               title="Pasar a PRO"
               className="w-10 h-10 mx-auto rounded-lg bg-slate-900 text-[#f4f1e8] dark:bg-slate-100 dark:text-slate-900 grid place-items-center active:scale-95 transition-transform"
             >
@@ -202,7 +208,7 @@ export const Sidebar = ({
           <div className="flex flex-col">
             {onOpenLanding && (
               <button
-                onClick={onOpenLanding}
+                onClick={closeThen(onOpenLanding)}
                 className="h-8 px-2.5 rounded-lg text-[12.5px] text-slate-600 dark:text-slate-400 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] hover:text-slate-900 flex items-center justify-between transition-colors"
               >
                 <span>Ver sitio público</span>
@@ -211,7 +217,7 @@ export const Sidebar = ({
             )}
             {onOpenLegal && (
               <button
-                onClick={() => onOpenLegal('auditoria')}
+                onClick={closeThen(() => onOpenLegal('auditoria'))}
                 className="h-8 px-2.5 rounded-lg text-[12.5px] text-slate-600 dark:text-slate-400 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] hover:text-slate-900 flex items-center justify-between transition-colors"
               >
                 <span className="flex items-center gap-2">
@@ -239,7 +245,7 @@ export const Sidebar = ({
           )}
           {!isCollapsed && onLogout && (
             <button
-              onClick={onLogout}
+              onClick={closeThen(onLogout)}
               title="Cerrar sesión"
               aria-label="Cerrar sesión"
               className="w-8 h-8 grid place-items-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.05] dark:hover:text-slate-100 transition-colors"

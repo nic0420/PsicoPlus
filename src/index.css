@@ -545,3 +545,46 @@
   from { transform: translateX(-100%); }
   to { transform: none; }
 }
+
+/* ==========================================================================
+   Móviles (Android + iPhone)
+   ========================================================================== */
+
+/* iOS Safari hace zoom al enfocar campos con texto < 16px: lo evitamos en pantallas táctiles */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Modales como "bottom sheet" en celulares, usando alto dinámico (barra de Safari/Chrome) */
+@media (max-width: 639px) {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal-backdrop > * {
+    width: 100%;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    max-height: 92dvh !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* Evita el rebote/scroll horizontal accidental en iOS */
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Tap sin demora ni resaltado gris en Android */
+a, button, [role="button"], label, summary {
+  -webkit-tap-highlight-color: transparent;
+}

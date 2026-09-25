@@ -27,10 +27,29 @@ export const PLAN_LIMITS = {
     permitirInformesClinicosPDF: true,
     permitirExportacionExcel: true,
     nombre: 'Plan PRO Ilimitado',
-    precioMensual: 14900, // ARS
-    precioAnual: 143000, // ARS (~20% OFF)
+    precioMensual: 8000, // ARS por mes
+    precioAnual: 60000, // ARS por año (equivale a $5.000/mes)
   }
 };
+
+/** Precios PRO (ARS). Cambiarlos acá actualiza la landing y el modal de suscripción. */
+export const PRO_PRICING = {
+  monthly: { total: 8000, perMonth: 8000, label: 'Mensual' },
+  annual: { total: 60000, perMonth: 5000, label: 'Anual' },
+};
+export const ANNUAL_SAVINGS = PRO_PRICING.monthly.perMonth * 12 - PRO_PRICING.annual.total; // 36.000
+export const ANNUAL_DISCOUNT_PCT = Math.floor((ANNUAL_SAVINGS / (PRO_PRICING.monthly.perMonth * 12)) * 100); // 37
+
+/** Datos de cobro (transferencia a Mercado Pago). */
+export const PAYMENT_INFO = {
+  provider: 'Mercado Pago',
+  alias: 'nico.adolfo.mp',
+  cvu: '0000003100004965726450',
+  // WhatsApp donde se reciben los comprobantes (formato internacional, sin +). CONFIRMAR NÚMERO.
+  whatsapp: '5493794889922',
+};
+
+export const formatARS = (n) => `$${Number(n || 0).toLocaleString('es-AR')}`;
 
 export const PROMO_CODES = {
   'LANZAMIENTO2026': { plan: PLANS.PRO, dias: 365, descripcion: 'Acceso PRO 1 Año Bonificado (Lanzamiento)' },

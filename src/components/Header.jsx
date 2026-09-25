@@ -29,7 +29,7 @@ const TAB_TITLES = {
 const IconButton = ({ children, className = '', ...props }) => (
   <button
     {...props}
-    className={`h-9 min-w-9 px-2 inline-flex items-center justify-center gap-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06] active:scale-95 transition-[background-color,color,transform] duration-150 ${className}`}
+    className={`flex-shrink-0 h-9 min-w-9 px-2 inline-flex items-center justify-center gap-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.06] active:scale-95 transition-[background-color,color,transform] duration-150 ${className}`}
   >
     {children}
   </button>
@@ -65,14 +65,14 @@ export const Header = ({
 
   return (
     <header className="sticky top-0 z-30 w-full pt-safe bg-[var(--bg-app)]/85 backdrop-blur-md border-b border-[var(--border-color)]">
-      <div className="h-14 md:h-16 flex items-center gap-3 px-3.5 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
+      <div className="h-14 md:h-16 flex items-center gap-2 sm:gap-3 px-3 sm:px-3.5 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
 
         {/* Mobile: menú + marca */}
         <div className="flex items-center gap-1.5 md:hidden">
           <IconButton onClick={onOpenMobileMenu} aria-label="Abrir menú" className="-ml-1.5">
             <Menu size={20} />
           </IconButton>
-          <BrandMark size={28} />
+          <span className="hidden min-[400px]:inline-grid"><BrandMark size={28} /></span>
         </div>
 
         {/* Título de sección + fecha */}
@@ -118,12 +118,12 @@ export const Header = ({
           </div>
 
           {/* Select (mobile / tablet) */}
-          <label className="2xl:hidden relative inline-flex items-center max-w-full">
+          <label className="2xl:hidden relative flex items-center w-full max-w-[200px] min-w-0">
             <span className="sr-only">Sede</span>
             <select
               value={selectedSedeId}
               onChange={(e) => onSelectSede(e.target.value)}
-              className="appearance-none h-9 pl-3 pr-8 max-w-[200px] truncate rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] text-[13px] font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:shadow-[var(--focus-ring)]"
+              className="appearance-none w-full h-9 pl-3 pr-8 max-w-[200px] truncate rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] text-[13px] font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:shadow-[var(--focus-ring)]"
             >
               <option value="all">Todas las sedes</option>
               {sedes.map((s) => (
@@ -135,12 +135,12 @@ export const Header = ({
         </div>
 
         {/* Acciones */}
-        <div className="flex items-center gap-1 sm:gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
           {onOpenSearch && (
             <button
               onClick={onOpenSearch}
               title="Buscar (Ctrl + K)"
-              className="h-9 inline-flex items-center gap-2 pl-2.5 pr-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300 transition-colors"
+              className="h-9 hidden min-[380px]:inline-flex flex-shrink-0 items-center gap-2 pl-2.5 pr-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300 transition-colors"
             >
               <Search size={15} />
               <span className="hidden xl:inline text-[13px] pr-6">Buscar paciente, turno…</span>
@@ -149,16 +149,18 @@ export const Header = ({
           )}
 
           {turnosWebPendientesCount > 0 && onNavigatePortal && (
+            <span className="hidden sm:contents">
             <IconButton
               onClick={onNavigatePortal}
               title={`${turnosWebPendientesCount} solicitudes de turno web`}
-              className="hidden sm:inline-flex relative"
+              className="relative"
             >
               <Globe size={17} />
               <span className="absolute top-1 right-1 min-w-4 h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-semibold grid place-items-center">
                 {turnosWebPendientesCount}
               </span>
             </IconButton>
+            </span>
           )}
 
           {pacientesEnAlertaCount > 0 && (

@@ -254,7 +254,7 @@ export const AgendaView = ({
             <button
               type="button"
               onClick={() => setAgendaViewMode('grid')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+              className={`px-3 h-9 sm:h-8 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
                 agendaViewMode === 'grid'
                   ? 'bg-white dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shadow-xs'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
@@ -266,7 +266,7 @@ export const AgendaView = ({
             <button
               type="button"
               onClick={() => setAgendaViewMode('list')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
+              className={`px-3 h-9 sm:h-8 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
                 agendaViewMode === 'list'
                   ? 'bg-white dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shadow-xs'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'

@@ -370,8 +370,8 @@ export const PacientesView = ({
           <div className="card max-w-3xl w-full p-5 sm:p-6 shadow-[var(--shadow-hover)] space-y-4 max-h-[92vh] overflow-y-auto">
             
             {/* Header del Perfil */}
-            <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div className="min-w-0 pr-10 sm:pr-0">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h3 className="text-lg font-semibold font-display text-slate-900 dark:text-white">
                     {selectedPaciente.nombreCompleto}
@@ -385,7 +385,7 @@ export const PacientesView = ({
                 </p>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {onNavigateFacturar && (
                   <button
                     onClick={() => onNavigateFacturar(selectedPaciente)}
@@ -421,7 +421,8 @@ export const PacientesView = ({
                 )}
                 <button
                   onClick={() => onSelectPaciente(null)}
-                  className="p-1 text-slate-400 hover:text-slate-600"
+                  aria-label="Cerrar ficha"
+                  className="absolute top-3 right-3 sm:static w-10 h-10 grid place-items-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-900/5"
                 >
                   <XCircle size={20} />
                 </button>

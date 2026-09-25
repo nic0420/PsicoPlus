@@ -245,7 +245,7 @@ export const ConfiguracionView = ({
             <Key size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Ingresar código de convenio o activación (Ej: LANZAMIENTO2026)"
+              placeholder="Ingresar código de convenio o activación"
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
               className="w-full h-10 pl-9 pr-3 bg-white/[0.06] border border-white/15 rounded-lg text-[13px] text-white placeholder:text-emerald-200/50 focus:outline-none focus:border-emerald-300 font-mono tracking-wider"

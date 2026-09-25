@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import { BrandMark, BrandWordmark } from '../Common/BrandMark';
+import { PRO_PRICING, ANNUAL_SAVINGS, ANNUAL_DISCOUNT_PCT, formatARS, PAYMENT_INFO } from '../../services/subscription';
 
 /* Revela elementos .reveal al entrar en viewport (una sola vez) */
 const useReveal = () => {
@@ -130,8 +131,8 @@ const FAQS = [
     a: 'Sí, totalmente gratuito. Podés gestionar hasta 15 pacientes activos, tu agenda de turnos completa, historias clínicas y registro de cobros sin pagar nada ni ingresar tarjeta de crédito.',
   },
   {
-    q: '¿Cómo funciona el desbloqueo del Plan PRO?',
-    a: 'Cuando tu consultorio crezca o necesites funciones avanzadas (pacientes ilimitados, múltiples sedes, liquidación masiva de obras sociales o informes clínicos en PDF), podés desbloquear el Plan PRO con suscripción mensual, anual con descuento o códigos promocionales de convenios con colegios de psicólogos.',
+    q: '¿Cuánto cuesta PRO y cómo se paga?',
+    a: `PsicoPlus PRO cuesta ${formatARS(PRO_PRICING.monthly.perMonth)} por mes, o ${formatARS(PRO_PRICING.annual.total)} por año (equivale a ${formatARS(PRO_PRICING.annual.perMonth)} por mes). Se paga por transferencia a ${PAYMENT_INFO.provider} (alias ${PAYMENT_INFO.alias}) desde la app, y activamos tu cuenta apenas recibimos el comprobante. También podés usar códigos de convenio con colegios de psicólogos.`,
   },
   {
     q: '¿Mis datos y los de mis pacientes están protegidos?',
@@ -309,7 +310,7 @@ export const LandingPage = ({
   return (
     <div
       ref={rootRef}
-      className="landing min-h-screen bg-[#f7f5f0] text-[#1b1d1a] font-sans antialiased overflow-x-hidden [color-scheme:light]"
+      className="landing min-h-screen bg-[#f7f5f0] text-[#1b1d1a] font-sans antialiased overflow-x-clip [color-scheme:light]"
     >
       {/* Anuncio */}
       <div className="bg-[#1c4540] text-[#d9eae5] text-[13px] py-2 px-4 text-center">
@@ -335,12 +336,13 @@ export const LandingPage = ({
             <button onClick={onLogin} className="hidden sm:inline-flex h-9 px-3.5 items-center rounded-lg text-[14px] font-medium text-[#2c2d29] hover:bg-[#1b1d1a]/[0.05] transition-colors">
               Iniciar sesión
             </button>
-            <button onClick={onStartFree} className="h-9 px-4 inline-flex items-center gap-1.5 rounded-lg bg-[#22554d] text-[#fbfaf6] text-[14px] font-medium shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_1px_2px_rgba(23,56,52,.25)] hover:bg-[#1c4540] active:scale-[0.97] transition-[background-color,transform] duration-150">
-              Crear cuenta gratis
+            <button onClick={onStartFree} className="h-9 px-4 inline-flex items-center gap-1.5 rounded-lg bg-[#22554d] text-[#fbfaf6] text-[14px] font-medium shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_1px_2px_rgba(23,56,52,.25)] hover:bg-[#1c4540] active:scale-[0.97] transition-[background-color,transform] duration-150 whitespace-nowrap">
+              <span className="hidden min-[400px]:inline">Crear cuenta gratis</span>
+              <span className="min-[400px]:hidden">Empezar gratis</span>
             </button>
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              className="lg:hidden w-9 h-9 grid place-items-center rounded-lg text-[#2c2d29] hover:bg-[#1b1d1a]/[0.05]"
+              className="lg:hidden flex-shrink-0 w-10 h-10 grid place-items-center rounded-lg text-[#2c2d29] hover:bg-[#1b1d1a]/[0.05]"
               aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
               aria-expanded={menuOpen}
             >
@@ -599,7 +601,7 @@ export const LandingPage = ({
                   }`}
                 >
                   {label}
-                  {val === 'annual' && <span className="text-[11px] px-1.5 py-px rounded bg-[#eef5f3] text-[#22554d]">−20%</span>}
+                  {val === 'annual' && <span className="text-[11px] px-1.5 py-px rounded bg-[#f6ead2] text-[#7a4f1f] font-semibold">−{ANNUAL_DISCOUNT_PCT}%</span>}
                 </button>
               ))}
             </div>
@@ -629,11 +631,11 @@ export const LandingPage = ({
               <span className="absolute top-6 right-6 text-[11.5px] font-medium px-2 py-0.5 rounded-md bg-[#b5d5cc] text-[#0c201e]">Recomendado</span>
               <h3 className="text-[15px] font-semibold">PsicoPlus PRO</h3>
               <p className="mt-4 flex items-baseline gap-2">
-                <span className="font-serif text-[3.2rem] leading-none tabular-nums">{pricingCycle === 'annual' ? '$11.900' : '$14.900'}</span>
+                <span className="font-serif text-[3.2rem] leading-none tabular-nums">{formatARS(PRO_PRICING[pricingCycle].perMonth)}</span>
                 <span className="text-[14px] text-[#a29e93]">/ mes · ARS</span>
               </p>
               <p className="text-[14px] text-[#a29e93] mt-3">
-                {pricingCycle === 'annual' ? 'Facturado anualmente ($143.000/año) · ahorrás 2 meses' : 'Sin permanencia · cancelás cuando quieras'}
+                {pricingCycle === 'annual' ? `${formatARS(PRO_PRICING.annual.total)} por año · ahorrás ${formatARS(ANNUAL_SAVINGS)}` : 'Sin permanencia · cancelás cuando quieras'}
               </p>
               <ul className="mt-6 space-y-2.5 text-[14.5px] flex-1">
                 {['Pacientes ilimitados', 'Sedes ilimitadas (centro, norte, virtual)', 'Liquidaciones de obras sociales por lote', 'Portal de pacientes con tu link propio', 'Informes clínicos y aptos en PDF', 'Reportes financieros y proyección de cobros', 'Backup y exportación a Excel'].map((b) => (
@@ -643,6 +645,7 @@ export const LandingPage = ({
               <button onClick={onStartFree} className="mt-8 h-11 rounded-xl bg-[#f4f1e8] text-[#1b1d1a] text-[14.5px] font-medium hover:bg-white active:scale-[0.98] transition-[background-color,transform] duration-150">
                 Desbloquear PsicoPlus PRO
               </button>
+              <p className="text-center text-[12.5px] text-[#a29e93] mt-3">Pago por transferencia a {PAYMENT_INFO.provider}</p>
             </div>
           </div>
         </section>
