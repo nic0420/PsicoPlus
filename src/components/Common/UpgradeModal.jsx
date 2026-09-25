@@ -18,8 +18,6 @@ import {
 } from 'lucide-react';
 import {
   activatePromoCode,
-  switchPlanDirectly,
-  PLANS,
   PRO_PRICING,
   ANNUAL_SAVINGS,
   ANNUAL_DISCOUNT_PCT,
@@ -162,13 +160,6 @@ export const UpgradeModal = ({
     toast.showInfo('Adjuntá el comprobante en WhatsApp. Activamos tu PRO apenas lo recibamos.');
   };
 
-  const handleInstantTrial = () => {
-    const res = switchPlanDirectly(PLANS.PRO);
-    toast.showSuccess('¡Modo PRO activado!');
-    if (onPlanUpdated) onPlanUpdated(res);
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 md:p-6" role="dialog" aria-modal="true" aria-label="Suscripción PsicoPlus PRO">
       <div onClick={handleClose} className="fixed inset-0 bg-slate-950/45 backdrop-blur-[6px] animate-[backdropIn_.2s_ease-out]" />
@@ -269,20 +260,13 @@ export const UpgradeModal = ({
             {/* Código / prueba */}
             <div className="border-t border-[var(--border-color)] mt-7 pt-4">
               {!showPromoInput ? (
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setShowPromoInput(true)}
                     className="h-10 inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 underline decoration-slate-300 underline-offset-4"
                   >
                     <Gift size={14} /> ¿Tenés un código de convenio?
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleInstantTrial}
-                    className="h-10 inline-flex items-center gap-1 text-[13px] font-medium text-emerald-700 dark:text-emerald-300"
-                  >
-                    Probar PRO en la demo <ArrowRight size={14} />
                   </button>
                 </div>
               ) : (
